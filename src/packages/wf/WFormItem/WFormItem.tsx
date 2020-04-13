@@ -6,7 +6,9 @@ export default class WFormItem extends Vue {
   private getConfig?: getFormConfig;
   @Prop({ type: Object })
   private defaultValues: CommonProp = {};
+  @Prop({ type: Function, required: true })
+  private createForm!: (form: any) => any;
   render(): VNode | null {
-    return <div>dadada</div>;
+    return <div style="width:100%;height:100%;">dadada</div>;
   }
 }
