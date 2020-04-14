@@ -8,7 +8,7 @@ import {
   FormValue,
   FormConfigItem
 } from "../../types";
-export default class WFormItem extends Vue {
+export default class WForm extends Vue {
   @Prop({ type: Function })
   private configFunc: getFormConfig = () => ({});
   @Prop({ type: Object })
@@ -47,7 +47,7 @@ export default class WFormItem extends Vue {
     }
   }
 
-  setValues(obj: CommonProp): void {
+  setValues<T extends CommonProp = any>(obj: T): void {
     const keys = Object.keys(obj || {});
     keys.forEach(x => {
       const currentFormItem = this.formMap[x];
@@ -112,7 +112,7 @@ export default class WFormItem extends Vue {
   //   other.setDisabled(this.disabled)
   //   this.formMap[name] = other
   // }
-  render(): VNode | null {
+  render(): VNode {
     return <div style="width:100%;height:100%;">dadada</div>;
   }
 }
@@ -130,8 +130,8 @@ function setFormatValue<T = any>(config: FormConfigItem, value: T): T | Moment {
   }
 }
 function getFormatValue(config: FormConfigItem, value: any): any {
-  const { formatFunc, type, props } = config;
-  const { format } = props || {};
+  const { formatFunc, type, childProps } = config;
+  const { format } = childProps || {};
   if (formatFunc) {
     return formatFunc(value);
   }
