@@ -19,7 +19,9 @@ import {
   formDelegate,
   FormStatusType,
   FormItemValue,
-  StatusMessage
+  StatusMessage,
+  ControllerRenderParams,
+  RenderItemFunc
 } from "@/packages/types/wform";
 const myDebounce = new Debounce();
 const defaultInputStyle = { width: "100%" };
@@ -44,17 +46,26 @@ export default class WFormItem extends Vue implements FormItemMethods {
   readonly delegate?: formDelegate;
   @Prop()
   readonly options?: any;
-  protected currentDefaultValue: any = undefined;
-  protected currentControlValue: any = undefined;
-  protected isShowStatus = true;
-  protected currentHasError = false;
-  protected currentMessage: string | VNode | null = "";
-  protected currentDisabled = false;
-  protected currentStatus: FormStatusType = FormStatusType.success;
-  protected changeFunc: Function = ({ target: { value } }: any) => {
+  @Prop({ type: Function })
+  readonly renderItem?: RenderItemFunc;
+
+  //这边属性如果不付值的话将不会被注入vue的data中 大坑 而且不能赋值为undefined
+  private currentDefaultValue: any = null;
+  private currentControlValue: any = null;
+  private isShowStatus = true;
+  private currentHasError = false;
+  private currentMessage: string | VNode | null = null;
+  private currentDisabled = false;
+  private currentStatus: FormStatusType | null = null;
+  private isNormalChangeFunc = true;
+  private changeFunc({ target: { value } }: any) {
     this.setDebounceValue(value);
     this.onValueChange();
-  };
+  }
+  private otherChangeFunc(value: any) {
+    this.setDebounceValue(value);
+    this.onValueChange();
+  }
 
   mounted() {
     this.delegate &&
@@ -75,11 +86,12 @@ export default class WFormItem extends Vue implements FormItemMethods {
       });
   }
   set hasError(value: boolean) {
-    this.isShowStatus = true;
+    this.currentHasError = value;
     if (value) {
       this.currentStatus = FormStatusType.error;
     } else {
       this.currentStatus = FormStatusType.success;
+      this.currentMessage = null;
     }
   }
   get hasError(): boolean {
@@ -112,12 +124,10 @@ export default class WFormItem extends Vue implements FormItemMethods {
   }
   // 当前控件的状态
   get status(): StatusMessage {
-    const currentStatus = this.isShowStatus
-      ? this.currentStatus
-      : FormStatusType.success;
+    const currentStatus = this.isShowStatus ? this.currentStatus : null;
     return {
       status: currentStatus,
-      message: this.currentMessage || ""
+      message: this.isShowStatus ? this.currentMessage : null
     };
   }
   //设值
@@ -152,6 +162,7 @@ export default class WFormItem extends Vue implements FormItemMethods {
    * 会返回一个 校验状态 通过则 true 否则 false
    */
   async onValidate(): Promise<boolean> {
+    this.isShowStatus = true;
     let isOk = true;
     if (this.config.required) {
       switch (true) {
@@ -180,7 +191,9 @@ export default class WFormItem extends Vue implements FormItemMethods {
     if (this.config.validate) {
       this.currentStatus = FormStatusType.validating;
       this.currentMessage = await this.config.validate(this.currentValue);
-      this.hasError = this.currentMessage === null;
+      this.hasError = this.currentMessage !== null;
+    } else {
+      this.hasError = false;
     }
     return !this.hasError;
   }
@@ -221,136 +234,112 @@ export default class WFormItem extends Vue implements FormItemMethods {
   @Emit("change")
   //eslint-disable-next-line
   protected onValueChange(_extra?: any) {
-    return this.currentControlValue;
+    return this.currentValue;
   }
   //控件本身
-  get child(): ScopedSlotChildren {
+  get inputController(): ScopedSlotChildren | VNode[] {
+    const value = this.currentValue;
+    const config = this.config;
+    const defaultValue = this.currentDefaultValue;
     const scopedSlotFunc = this.$scopedSlots["default"];
     if (scopedSlotFunc) {
       return scopedSlotFunc({
         setValue: this.setDebounceValue
       });
     }
-    const otherChangeFunc = (value: any) => {
-      this.setDebounceValue(value);
-      this.onValueChange();
-    };
-    let currentController;
+    let currentController: VNode;
+    const params: ControllerRenderParams = { config, value, defaultValue };
     switch (this.config.type) {
       case FormItemType.radio:
-        currentController = this.renderRadio;
+        currentController = this.renderOptionsController(params);
         break;
       case FormItemType.select:
-        currentController = this.renderSelector;
-        this.changeFunc = otherChangeFunc;
+        currentController = this.renderOptionsController(params);
+        this.isNormalChangeFunc = false;
         break;
       case FormItemType.week:
       case FormItemType.date:
       case FormItemType.month:
       case FormItemType.number:
       case FormItemType.switch:
-        this.changeFunc = otherChangeFunc;
-        currentController = this.formInput;
+        this.isNormalChangeFunc = false;
+        currentController = this.getFormInput(params);
         break;
       default:
-        currentController = this.formInput;
+        currentController = this.getFormInput(params);
     }
     return [currentController];
   }
-  // 获取控件
-  get formInput(): VNode {
-    const childProps = this.config.childProps;
-    const defaultValue = this.currentDefaultValue;
-    const value = this.currentControlValue;
-    return this.$createElement(NodeMap[this.config.type], {
-      style: defaultInputStyle,
-      props: {
-        defaultValue,
-        value,
-        ...childProps
-      },
-      on: {
-        change: this.changeFunc
-      }
-    });
-  }
-  //其他 特殊的控件渲染
-  // select
-  get renderSelector(): VNode {
-    const childProps = this.config.childProps;
-    const defaultValue = this.currentDefaultValue;
-    const value = this.currentControlValue;
-    const options: any[] = this.options as any[];
-    const optionVNodes = options.map(optionItem => {
-      if (!this.$scopedSlots["select"])
-        throw "选择器需要一个渲染下拉选项的函数";
-      return this.$scopedSlots["select"](optionItem);
-    });
+  // 获取基本空间
+  getFormInput(
+    { config, value, defaultValue }: ControllerRenderParams,
+    children: VNode[] | ScopedSlotChildren = []
+  ): VNode {
     return this.$createElement(
-      NodeMap[this.config.type],
+      NodeMap[config.type],
       {
         style: defaultInputStyle,
         props: {
           defaultValue,
           value,
-          ...childProps
+          placeholder: this.config.placeholder,
+          ...this.config.childProps
         },
         on: {
-          change: this.changeFunc
+          change: (event: any) => {
+            if (this.isNormalChangeFunc) {
+              this.changeFunc(event);
+            } else {
+              this.otherChangeFunc(event);
+            }
+          }
         }
       },
-      optionVNodes
+      children
     );
   }
-  get renderRadio(): VNode {
-    const childProps = this.config.childProps;
-    const defaultValue = this.currentDefaultValue;
-    const value = this.currentControlValue;
+  //渲染带有option的控件
+  renderOptionsController({
+    config,
+    value,
+    defaultValue
+  }: ControllerRenderParams): VNode {
     const options: any[] = this.options as any[];
-    const optionVNodes = options.map(optionItem => {
-      if (!this.$scopedSlots["radio"]) throw "选择器需要一个渲染下拉选项的函数";
-      return this.$scopedSlots["radio"](optionItem);
-    });
-    return this.$createElement(
-      NodeMap[this.config.type],
-      {
-        style: defaultInputStyle,
-        props: {
-          defaultValue,
-          value,
-          ...childProps
-        },
-        on: {
-          change: this.changeFunc
-        }
-      },
-      optionVNodes
-    );
+    let optionVNodes: any[] = [];
+    if (this.renderItem) {
+      optionVNodes = options.map(optionItem => {
+        if (this.renderItem) return this.renderItem(optionItem);
+      });
+    }
+    return this.getFormInput({ config, value, defaultValue }, optionVNodes);
   }
 
-  @Watch("config", { immediate: true })
+  @Watch("config.defaultValue", { immediate: true })
   watchDefaultValues(val: FormConfigItem) {
-    this.currentDefaultValue = val.defaultValue;
+    this.currentDefaultValue = val;
+    this.currentControlValue = val;
   }
 
   protected render(h: CreateElement): VNode {
     //准备数据
     const { status, message } = this.status;
-    const disabled = this.currentDisabled;
     const config = this.config;
-    const child = this.child;
-
+    const inputController = this.inputController;
     return h(
       Form.Item,
       {
+        style: {
+          textAlign: this.config.props?.labelAlign || "left"
+        },
         props: {
-          disabled,
           help: message,
-          status,
+          validateStatus: status,
+          label: this.config.label,
+          required: this.config.required,
           ...config.props
         }
       },
-      [child]
+      [inputController]
     );
   }
 }

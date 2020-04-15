@@ -1,5 +1,5 @@
 import { VNode } from "vue";
-import { Col } from "ant-design-vue/types";
+import { ColSpanType } from "ant-design-vue/types/grid/col";
 /**
  *  form 的一些申明文件
  */
@@ -7,7 +7,40 @@ import { Col } from "ant-design-vue/types";
 export type FormConfig = {
   [key: string]: FormConfigItem;
 };
-export type AntCol = Col;
+export type AntCol = {
+  span?: ColSpanType;
+  xs?: { span: ColSpanType; offset: ColSpanType } | ColSpanType;
+
+  /**
+   * ≥576px, could be a span value or an object containing above props
+   * @type { span: ColSpanType, offset: ColSpanType } | ColSpanType
+   */
+  sm?: { span: ColSpanType; offset: ColSpanType } | ColSpanType;
+
+  /**
+   * ≥768px, could be a span value or an object containing above props
+   * @type { span: ColSpanType, offset: ColSpanType } | ColSpanType
+   */
+  md?: { span: ColSpanType; offset: ColSpanType } | ColSpanType;
+
+  /**
+   * ≥992px, could be a span value or an object containing above props
+   * @type { span: ColSpanType, offset: ColSpanType } | ColSpanType
+   */
+  lg?: { span: ColSpanType; offset: ColSpanType } | ColSpanType;
+
+  /**
+   * ≥1200px, could be a span value or an object containing above props
+   * @type { span: ColSpanType, offset: ColSpanType } | ColSpanType
+   */
+  xl?: { span: ColSpanType; offset: ColSpanType } | ColSpanType;
+
+  /**
+   * ≥1600px, could be a span value or an object containing above props
+   * @type { span: ColSpanType, offset: ColSpanType } | ColSpanType
+   */
+  xxl?: { span: ColSpanType; offset: ColSpanType } | ColSpanType;
+};
 export enum FormItemType {
   text = "text",
   select = "select",
@@ -38,12 +71,13 @@ export type FormProps = {
   extra?: string | VNode;
   htmlFor?: string;
   labelAlign?: LabelAlign;
-  labelCol: AntCol;
-  wrapperCol: AntCol;
+  labelCol?: AntCol;
+  wrapperCol?: AntCol;
 };
 export type FormConfigItem = {
   key?: string;
   type: FormItemType;
+  placeholder?: string;
   required?: boolean;
   tip?: setTip | string;
   label?: string | VNode;
@@ -60,7 +94,7 @@ export type SelectOption = {
   meta: CommonProp;
 };
 export type setTip = {
-  (item: FormConfigItem): string;
+  (item?: FormConfigItem): string | VNode;
 };
 export type getFormConfig = {
   (context: any, params?: any): FormConfig;
@@ -132,6 +166,15 @@ export interface FormItemMethods {
   setStatusMessage: (obj: StatusMessage) => void;
 }
 export type StatusMessage = {
-  status: FormStatusType;
-  message: string | VNode;
+  status: FormStatusType | null;
+  message: string | VNode | null;
+};
+
+export type ControllerRenderParams = {
+  config: FormConfigItem;
+  value: any;
+  defaultValue: any;
+};
+export type RenderItemFunc = {
+  (item: any): VNode;
 };

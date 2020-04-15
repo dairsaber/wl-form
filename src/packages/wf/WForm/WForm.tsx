@@ -160,14 +160,11 @@ export default class WForm extends Vue implements FormController {
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       const currentFormItem = this.formMap[key];
-      const {
-        error,
-        value
-      } = await currentFormItem.methods.getValueWithValidate();
+      const { error, value } = await this.getValueWithValidate(key);
       if (!hasError && error) {
         hasError = true;
       }
-      const currentValue = value[key];
+      const currentValue = value;
       result = {
         ...result,
         [key]: getFormatValue(currentFormItem.config, currentValue)
