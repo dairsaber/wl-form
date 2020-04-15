@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require("path");
+// const path = require("path");
 
-function resolve(dir) {
-  return path.join(__dirname, dir);
-}
+// function resolve(dir) {
+//   return path.join(__dirname, dir);
+// }
 
 module.exports = {
   pages: {
@@ -13,7 +13,4 @@ module.exports = {
       filename: "index.html"
     }
   }
-  // chainWebpack: config => {
-  //   config.resolve.alias.set("types", "types");
-  // }
 };

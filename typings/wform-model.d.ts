@@ -1,9 +1,9 @@
-import Vue, { VNode } from "vue";
+import { VNode } from "vue";
 import { Col } from "ant-design-vue/types";
 /**
  *  form 的一些申明文件
  */
-declare namespace wform {
+export declare namespace wform {
   export type FormConfig = {
     [key: string]: FormConfigItem;
   };

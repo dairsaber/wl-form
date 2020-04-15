@@ -1,5 +1,4 @@
-import Vue, { VNode } from "vue";
-
+import Vue, { VNode, VueConstructor } from "vue";
 declare global {
   namespace JSX {
     // tslint:disable no-empty-interface

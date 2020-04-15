@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": false,
   "main": "lib/wf.umd.min.js",
+  "typings": "typings/index.d.ts",
+  "files": [
+    "lib/**/*",
+    "typings/*"
+  ],
+  "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name wf --dest lib src/packages/install.ts"

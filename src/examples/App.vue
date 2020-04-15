@@ -1,32 +1,40 @@
 <template>
   <div id="app">
-    <WForm
+    <w-form
       :defaultValues="{ text: '1232' }"
       :configFunc="configFunc"
       v-slot="{ delegate, getConfig }"
+      :createForm="createForm"
     >
-      <WFormItem :delegate="delegate" :config="getConfig('text')" />
-    </WForm>
+      <w-form-item :delegate="delegate" :config="getConfig('text')" />
+    </w-form>
+    heheda
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { wform } from "../../types";
+import {
+  getFormConfig,
+  FormItemType,
+  FormController
+} from "../packages/types/wform";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function configFunc(context: Vue) {
   return {
     text: {
-      type: wform.FormItemType.text,
+      type: FormItemType.text,
       label: "text"
     }
   };
 }
-@Component({
-  components: {}
-})
+@Component
 export default class App extends Vue {
-  private configFunc: wform.getFormConfig = configFunc;
+  private configFunc: getFormConfig = configFunc;
+  private _form?: FormController;
+  private createForm(formController: FormController) {
+    this._form = formController;
+  }
 }
 </script>
 
