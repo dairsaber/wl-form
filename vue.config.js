@@ -2,7 +2,7 @@
 const path = require("path");
 
 function resolve(dir) {
-  return path.join(__dirname, "..", dir);
+  return path.join(__dirname, dir);
 }
 
 module.exports = {
@@ -13,14 +13,7 @@ module.exports = {
       filename: "index.html"
     }
   }
-  //,
   // chainWebpack: config => {
-  //   config.module
-  //     .rule("ts")
-  //     .include.add(resolve("src/packages"))
-  //     .end()
-  //     .use("babel")
-  //     .loader("babel-loader")
-  //     .tap(option => option);
+  //   config.resolve.alias.set("types", "types");
   // }
 };

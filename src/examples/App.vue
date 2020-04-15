@@ -1,21 +1,33 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
-    <WTestPage />
+    <WForm
+      :defaultValues="{ text: '1232' }"
+      :configFunc="configFunc"
+      v-slot="{ delegate, getConfig }"
+    >
+      <WFormItem :delegate="delegate" :config="getConfig('text')" />
+    </WForm>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "./components/HelloWorld.vue";
-
+import { wform } from "../../types";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function configFunc(context: Vue) {
+  return {
+    text: {
+      type: wform.FormItemType.text,
+      label: "text"
+    }
+  };
+}
 @Component({
-  components: {
-    HelloWorld
-  }
+  components: {}
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  private configFunc: wform.getFormConfig = configFunc;
+}
 </script>
 
 <style lang="less">
