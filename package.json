@@ -1,17 +1,21 @@
 {
   "name": "wf_vue_package",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "private": false,
-  "main": "lib/wf.umd.min.js",
-  "typings": "typings/index.d.ts",
+  "main": "dist/wf.umd.min.js",
+  "typings": "types/index.d.ts",
   "files": [
-    "lib/**/*",
-    "typings/*"
+    "dist/wf.umd.min.js",
+    "dist/wf.css",
+    "types/*",
+    "package.json",
+    "README.md"
   ],
   "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name wf --dest lib src/packages/install.ts"
+    "build": "vue-cli-service build --target lib --name wf src/packages/install.ts",
+    "build-prod": "webpack --config build/webpack.prod.js --progress --hide-modules "
   },
   "dependencies": {
     "aftool": "^1.3.0",
@@ -41,6 +45,6 @@
     "typescript": "~3.8.3",
     "vue-template-compiler": "^2.6.11"
   },
-  "_id": "wf_vue_package@0.1.0",
+  "_id": "wf_vue_package@0.1.2",
   "readme": "ERROR: No README data found!"
 }

@@ -17,21 +17,31 @@
     <p>{{ currentValue }}</p>
   </div>
 </template>
-
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Test from "./components/Test";
-import {
-  getFormConfig,
-  FormItemType,
-  FormController,
-  FormConfig,
-  FormStatusType
-} from "../packages/types/wform";
 import { Icon, Button } from "ant-design-vue";
 import { VNode } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function configFunc(context: Vue): FormConfig {
+enum FormItemType {
+  text = "text",
+  select = "select",
+  radio = "radio",
+  date = "date",
+  month = "month",
+  week = "week",
+  number = "number",
+  textarea = "textarea",
+  checkbox = "checkbox",
+  switch = "switch",
+  checkboxGroup = "checkboxGroup"
+}
+enum FormStatusType {
+  error = "error",
+  success = "success",
+  warning = "warning",
+  validating = "validating"
+}
+function configFunc(context: Vue): wform.FormConfig {
   const h = context.$createElement;
   return {
     text: {
@@ -81,11 +91,12 @@ function configFunc(context: Vue): FormConfig {
     AButton: Button
   }
 })
+// eslint-disable no-undef
 export default class App extends Vue {
-  private configFunc: getFormConfig = configFunc;
-  private form: FormController | null = null;
+  private configFunc: wform.getFormConfig = configFunc;
+  private form: wform.FormController | null = null;
   private currentValue: any = {};
-  private createForm(formController: FormController) {
+  private createForm(formController: wform.FormController) {
     this.form = formController;
   }
   private async handleSubmit() {

@@ -4,8 +4,9 @@
 // function resolve(dir) {
 //   return path.join(__dirname, dir);
 // }
-
-module.exports = {
+const currentEnv = process.env.NODE_ENV;
+console.log("currentEnv===>", currentEnv);
+let config = {
   pages: {
     index: {
       entry: "src/examples/main.ts",
@@ -13,4 +14,16 @@ module.exports = {
       filename: "index.html"
     }
   }
+};
+if (currentEnv === "production") {
+  config = {
+    configureWebpack: {
+      output: {
+        libraryExport: "default"
+      }
+    }
+  };
+}
+module.exports = {
+  ...config
 };
