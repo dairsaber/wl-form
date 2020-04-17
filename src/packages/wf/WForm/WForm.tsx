@@ -65,38 +65,33 @@ export default class WForm extends Vue implements wform.FormController {
     this.createForm({
       submit: this.submit,
       getFormMap: this.getFormMap,
-      setValues: this.setValues,
       clearValues: this.clearValues,
       resetValues: this.resetValues,
       getValue: this.getValue,
       getValues: this.getValues,
+      setValues: this.setValues,
       setStatus: this.setStatus,
       setDefaultValue: this.setDefaultValue,
+      validate: this.validate,
+      setValuesWithValidate: this.setValuesWithValidate,
       getValueWithValidate: this.getValueWithValidate,
       setValueWithValidate: this.setValueWithValidate
     });
   }
-
+  //获得表单控件操作对象数组
   getFormMap(): wform.CommonProp {
     return this.formMap;
   }
-  async validate(key: string): Promise<boolean> {
-    const currentFormItem = this.formMap[key];
-    if (currentFormItem) {
-      return await currentFormItem.methods.onValidate();
+  //获取表单值  arr 不传则获取全部
+  getValues(keys?: string[]): wform.CommonProp {
+    if (!keys) {
+      keys = Object.keys(this.formMap);
     }
-    return false;
-  }
-
-  getValues(arr: string[]): wform.CommonProp {
-    if (!arr) {
-      arr = Object.keys(this.formMap);
-    }
-    return arr.reduce((prev: wform.CommonProp, current: string) => {
+    return keys.reduce((prev: wform.CommonProp, current: string) => {
       return { ...prev, [current]: this.getValue(current) };
     }, {});
   }
-
+  // 获取单个值
   getValue(key: string): any {
     const currentFormItem = this.formMap[key];
     return currentFormItem
@@ -106,7 +101,7 @@ export default class WForm extends Vue implements wform.FormController {
         )
       : undefined;
   }
-
+  //设置值
   setValues<T extends wform.CommonProp = any>(obj: T): void {
     const keys = Object.keys(obj || {});
     keys.forEach(x => {
@@ -117,35 +112,77 @@ export default class WForm extends Vue implements wform.FormController {
       }
     });
   }
-
+  //设置值并校验
+  setValuesWithValidate<T extends wform.CommonProp = any>(obj: T): void {
+    const keys = Object.keys(obj || {});
+    keys.forEach(x => {
+      const currentFormItem = this.formMap[x];
+      if (currentFormItem) {
+        const newValue = getFilterValue(currentFormItem.config, obj[x]);
+        currentFormItem.methods.setValueWithValidate(newValue);
+      }
+    });
+  }
+  // 单个设置值
+  setValue<T = any>(key: string, value: T) {
+    const currentFormItem = this.formMap[key];
+    if (currentFormItem) {
+      const newValue = getFilterValue(currentFormItem.config, value);
+      currentFormItem.methods.setValue(newValue);
+    }
+  }
+  // 单个设置值并校验
+  async setValueWithValidate(key: string, value: any): Promise<boolean> {
+    const currentFormItem = this.formMap[key];
+    if (currentFormItem) {
+      const newValue = getFilterValue(currentFormItem.config, value);
+      return await currentFormItem.methods.setValueWithValidate(newValue);
+    }
+    return false;
+  }
+  // 校验若不传key 则校验全部
+  async validate(key?: string): Promise<boolean> {
+    let validateKeys = Object.keys(this.formMap);
+    if (key) {
+      validateKeys = [key];
+    }
+    let hasError = false;
+    for (let i = 0; i < validateKeys.length; i++) {
+      const currentItem = this.formMap[validateKeys[i]];
+      if (currentItem) {
+        const validate = await currentItem.methods.onValidate();
+        if (!hasError && !validate) {
+          hasError = true;
+        }
+      }
+    }
+    return hasError;
+  }
+  //清除值
   clearValues(): boolean {
     Object.keys(this.formMap).forEach(x => {
       this.formMap[x].methods.setValue(undefined);
     });
     return true;
   }
-
+  //重置表单值为默认值
   resetValues(): boolean {
     Object.keys(this.formMap).forEach(x => {
       this.formMap[x].methods.resetValue();
     });
     return true;
   }
-
+  //获取值并交验 他会返回原始值 不会format 注意
   async getValueWithValidate(key: string): Promise<wform.FormItemValue<any>> {
     const currentFormItem = this.formMap[key];
     return currentFormItem.methods.getValueWithValidate();
-  }
-
-  async setValueWithValidate(key: string, value: any): Promise<boolean> {
-    const currentFormItem = this.formMap[key];
-    return currentFormItem.methods.setValueWithValidate(value);
   }
   //此方法放到异步栈中节省资源消耗 所以用async
   async setStatus(key: string, obj: wform.StatusMessage) {
     const currentFormItem = this.formMap[key];
     currentFormItem.methods.setStatusMessage(obj);
   }
+  // 提交并获取表单所以字段的值 并校验
   async submit<T>(): Promise<wform.FormValue<T>> {
     const keys = Object.keys(this.formMap);
     let hasError = false;

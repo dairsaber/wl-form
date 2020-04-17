@@ -116,11 +116,13 @@ declare global {
       clearValues: () => boolean;
       resetValues: () => boolean;
       getValue: <T = any>(key: string) => T;
-      getValues: (keys: string[]) => CommonProp;
+      getValues: (keys?: string[]) => CommonProp;
       setStatus: (key: string, obj: StatusMessage) => void;
       getValueWithValidate: (keys: string) => Promise<FormItemValue<any>>;
+      setValuesWithValidate: (obj: CommonProp) => void;
       setValueWithValidate: (key: string, value: any) => Promise<boolean>;
       setDefaultValue: (key: string, value: any) => void;
+      validate: (key?: string) => Promise<boolean>;
     }
 
     /**
