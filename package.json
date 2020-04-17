@@ -1,5 +1,5 @@
 {
-  "name": "w-form",
+  "name": "wl-form",
   "version": "0.1.4",
   "private": false,
   "main": "dist/wf.umd.min.js",
@@ -45,6 +45,6 @@
     "typescript": "~3.8.3",
     "vue-template-compiler": "^2.6.11"
   },
-  "_id": "w-form",
+  "_id": "wl-form",
   "readme": "表单 for vue"
 }
