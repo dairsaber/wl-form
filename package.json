@@ -1,5 +1,5 @@
 {
-  "name": "wf_vue_package",
+  "name": "w-form",
   "version": "0.1.4",
   "private": false,
   "main": "dist/wf.umd.min.js",
@@ -45,6 +45,6 @@
     "typescript": "~3.8.3",
     "vue-template-compiler": "^2.6.11"
   },
-  "_id": "wf_vue_package@0.1.4",
-  "readme": "ERROR: No README data found!"
+  "_id": "w-form",
+  "readme": "表单 for vue"
 }
