@@ -26,6 +26,7 @@ module.exports = merge(baseWebpackConfig, {
       amd: "vue",
       root: "Vue"
     },
+    "ant-design-vue": "ant-design-vue",
     aftool: "aftool",
     moment: "moment"
   },
