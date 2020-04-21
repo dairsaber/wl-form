@@ -10,7 +10,8 @@ module.exports = {
     index: {
       entry: "src/examples/main.ts",
       template: "public/index.html",
-      filename: "index.html"
+      filename: "index.html",
+      chunks: ["chunk-vendors", "chunk-common", "index"]
     }
   }
 };
