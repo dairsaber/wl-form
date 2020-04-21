@@ -3,17 +3,7 @@ import moment, { Moment } from "moment";
 import { VNode } from "vue";
 import { Spin, Empty } from "ant-design-vue";
 import { CreateElement } from "vue/types/umd";
-import {
-  FormController,
-  getFormConfig,
-  CommonProp,
-  FormItemInfo,
-  FormItemValue,
-  StatusMessage,
-  FormValue,
-  FormConfigItem,
-  FormItemType
-} from "@/packages/types/wform";
+import { FormItemType } from "../types/wf-types";
 /**
  * 判断值是否是空
  * @param val 任意值
@@ -21,12 +11,15 @@ import {
 function isNullOrUndefined(val: any) {
   return val === null || val === undefined;
 }
-const DATE_TYPES: FormItemType[] = [
+const DATE_TYPES: wform.FormItemType[] = [
   FormItemType.month,
   FormItemType.date,
   FormItemType.week
 ];
-function getFilterValue<T = any>(config: FormConfigItem, value: T): T | Moment {
+function getFilterValue<T = any>(
+  config: wform.FormConfigItem,
+  value: T
+): T | Moment {
   const { filterFunc, type } = config;
   if (filterFunc) {
     return filterFunc<T>(value);
@@ -37,7 +30,7 @@ function getFilterValue<T = any>(config: FormConfigItem, value: T): T | Moment {
     return value;
   }
 }
-function getFormatValue(config: FormConfigItem, value: any): any {
+function getFormatValue(config: wform.FormConfigItem, value: any): any {
   const { formatFunc, type, childProps } = config;
   if (formatFunc) {
     return formatFunc(value);
@@ -54,56 +47,51 @@ function getFormatValue(config: FormConfigItem, value: any): any {
   }
 }
 @Component
-export default class WForm extends Vue implements FormController {
+export default class WForm extends Vue implements wform.FormController {
   @Prop({ type: Boolean, default: false })
   readonly loading!: boolean;
   @Prop({ type: Function })
-  readonly configFunc!: getFormConfig;
+  readonly configFunc!: wform.getFormConfig;
   @Prop({ type: Object, default: () => ({}) })
-  readonly defaultValues!: CommonProp;
+  readonly defaultValues!: wform.CommonProp;
   @Prop({ type: Function, required: true })
-  readonly createForm!: (form: FormController) => void;
+  readonly createForm!: (form: wform.FormController) => void;
   @Prop({ type: Boolean, default: false })
   readonly disabled!: boolean;
 
-  protected formMap: { [key: string]: FormItemInfo } = {};
+  protected formMap: { [key: string]: wform.FormItemInfo } = {};
 
   protected created() {
     this.createForm({
       submit: this.submit,
       getFormMap: this.getFormMap,
-      setValues: this.setValues,
       clearValues: this.clearValues,
       resetValues: this.resetValues,
       getValue: this.getValue,
       getValues: this.getValues,
+      setValues: this.setValues,
       setStatus: this.setStatus,
       setDefaultValue: this.setDefaultValue,
+      validate: this.validate,
+      setValuesWithValidate: this.setValuesWithValidate,
       getValueWithValidate: this.getValueWithValidate,
       setValueWithValidate: this.setValueWithValidate
     });
   }
-
-  getFormMap(): CommonProp {
+  //获得表单控件操作对象数组
+  getFormMap(): wform.CommonProp {
     return this.formMap;
   }
-  async validate(key: string): Promise<boolean> {
-    const currentFormItem = this.formMap[key];
-    if (currentFormItem) {
-      return await currentFormItem.methods.onValidate();
+  //获取表单值  arr 不传则获取全部
+  getValues(keys?: string[]): wform.CommonProp {
+    if (!keys) {
+      keys = Object.keys(this.formMap);
     }
-    return false;
-  }
-
-  getValues(arr: string[]): CommonProp {
-    if (!arr) {
-      arr = Object.keys(this.formMap);
-    }
-    return arr.reduce((prev: CommonProp, current: string) => {
+    return keys.reduce((prev: wform.CommonProp, current: string) => {
       return { ...prev, [current]: this.getValue(current) };
     }, {});
   }
-
+  // 获取单个值
   getValue(key: string): any {
     const currentFormItem = this.formMap[key];
     return currentFormItem
@@ -113,8 +101,8 @@ export default class WForm extends Vue implements FormController {
         )
       : undefined;
   }
-
-  setValues<T extends CommonProp = any>(obj: T): void {
+  //设置值
+  setValues<T extends wform.CommonProp = any>(obj: T): void {
     const keys = Object.keys(obj || {});
     keys.forEach(x => {
       const currentFormItem = this.formMap[x];
@@ -124,36 +112,78 @@ export default class WForm extends Vue implements FormController {
       }
     });
   }
-
+  //设置值并校验
+  setValuesWithValidate<T extends wform.CommonProp = any>(obj: T): void {
+    const keys = Object.keys(obj || {});
+    keys.forEach(x => {
+      const currentFormItem = this.formMap[x];
+      if (currentFormItem) {
+        const newValue = getFilterValue(currentFormItem.config, obj[x]);
+        currentFormItem.methods.setValueWithValidate(newValue);
+      }
+    });
+  }
+  // 单个设置值
+  setValue<T = any>(key: string, value: T) {
+    const currentFormItem = this.formMap[key];
+    if (currentFormItem) {
+      const newValue = getFilterValue(currentFormItem.config, value);
+      currentFormItem.methods.setValue(newValue);
+    }
+  }
+  // 单个设置值并校验
+  async setValueWithValidate(key: string, value: any): Promise<boolean> {
+    const currentFormItem = this.formMap[key];
+    if (currentFormItem) {
+      const newValue = getFilterValue(currentFormItem.config, value);
+      return await currentFormItem.methods.setValueWithValidate(newValue);
+    }
+    return false;
+  }
+  // 校验若不传key 则校验全部
+  async validate(key?: string): Promise<boolean> {
+    let validateKeys = Object.keys(this.formMap);
+    if (key) {
+      validateKeys = [key];
+    }
+    let hasError = false;
+    for (let i = 0; i < validateKeys.length; i++) {
+      const currentItem = this.formMap[validateKeys[i]];
+      if (currentItem) {
+        const validate = await currentItem.methods.onValidate();
+        if (!hasError && !validate) {
+          hasError = true;
+        }
+      }
+    }
+    return hasError;
+  }
+  //清除值
   clearValues(): boolean {
     Object.keys(this.formMap).forEach(x => {
       this.formMap[x].methods.setValue(undefined);
     });
     return true;
   }
-
+  //重置表单值为默认值
   resetValues(): boolean {
     Object.keys(this.formMap).forEach(x => {
       this.formMap[x].methods.resetValue();
     });
     return true;
   }
-
-  async getValueWithValidate(key: string): Promise<FormItemValue<any>> {
+  //获取值并交验 他会返回原始值 不会format 注意
+  async getValueWithValidate(key: string): Promise<wform.FormItemValue<any>> {
     const currentFormItem = this.formMap[key];
     return currentFormItem.methods.getValueWithValidate();
   }
-
-  async setValueWithValidate(key: string, value: any): Promise<boolean> {
-    const currentFormItem = this.formMap[key];
-    return currentFormItem.methods.setValueWithValidate(value);
-  }
   //此方法放到异步栈中节省资源消耗 所以用async
-  async setStatus(key: string, obj: StatusMessage) {
+  async setStatus(key: string, obj: wform.StatusMessage) {
     const currentFormItem = this.formMap[key];
     currentFormItem.methods.setStatusMessage(obj);
   }
-  async submit<T>(): Promise<FormValue<T>> {
+  // 提交并获取表单所以字段的值 并校验
+  async submit<T>(): Promise<wform.FormValue<T>> {
     const keys = Object.keys(this.formMap);
     let hasError = false;
     let result = {};
@@ -173,9 +203,9 @@ export default class WForm extends Vue implements FormController {
     return { error: hasError, values: result as T };
   }
 
-  getConfig(key: string): FormConfigItem {
+  getConfig(key: string): wform.FormConfigItem {
     const currentConfig = this.configFunc(this);
-    const config: FormConfigItem = currentConfig[key] || {};
+    const config: wform.FormConfigItem = currentConfig[key];
     config.key = key;
     //初始值
     config.defaultValue = getFilterValue(config, this.defaultValues[key]);
@@ -186,7 +216,7 @@ export default class WForm extends Vue implements FormController {
     const currentFormItem = this.formMap[key];
     currentFormItem && currentFormItem.methods.setDefaultValue(value);
   }
-  delegate(formItemInfo: FormItemInfo) {
+  delegate(formItemInfo: wform.FormItemInfo) {
     formItemInfo.methods.setDisabled(this.disabled);
     const key = formItemInfo.config.key;
     if (key) {

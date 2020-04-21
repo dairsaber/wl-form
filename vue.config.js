@@ -4,8 +4,9 @@
 // function resolve(dir) {
 //   return path.join(__dirname, dir);
 // }
-
-module.exports = {
+const currentEnv = process.env.NODE_ENV;
+console.log("currentEnv===>", currentEnv);
+let config = {
   pages: {
     index: {
       entry: "src/examples/main.ts",
@@ -14,4 +15,27 @@ module.exports = {
       chunks: ["chunk-vendors", "chunk-common", "index"]
     }
   }
+};
+if (currentEnv === "production") {
+  config = {
+    configureWebpack: {
+      output: {
+        libraryExport: "default",
+        libraryTarget: "umd"
+      },
+      externals: {
+        vue: {
+          commonjs: "vue",
+          commonjs2: "vue",
+          amd: "vue",
+          root: "Vue"
+        },
+        aftool: "aftool",
+        moment: "moment"
+      }
+    }
+  };
+}
+module.exports = {
+  ...config
 };
