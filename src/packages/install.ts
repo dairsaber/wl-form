@@ -1,5 +1,5 @@
 import { VueConstructor } from "vue";
-import * as components from "./wf";
+import components from "./wf";
 
 function install(Vue: VueConstructor) {
   if ((install as any).installed) return;

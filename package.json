@@ -1,11 +1,12 @@
 {
   "name": "wl-form",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": false,
-  "main": "dist/wf.umd.min.js",
+  "main": "lib/main.js",
   "typings": "types/index.d.ts",
   "files": [
     "dist/wf.umd.min.js",
+    "lib/main.js",
     "dist/wf.css",
     "types/*",
     "package.json",
@@ -39,11 +40,15 @@
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^6.2.2",
+    "fibers": "^4.0.2",
+    "friendly-errors-webpack-plugin": "^1.7.0",
+    "happypack": "^5.0.1",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
     "prettier": "^1.19.1",
     "typescript": "~3.8.3",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "webpack-cli": "^3.3.11"
   },
   "_id": "wl-form",
   "readme": "表单 for vue"

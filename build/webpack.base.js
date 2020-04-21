@@ -50,16 +50,16 @@ exports.config = {
         test: /\.less$/,
         use: lessLoaders
       },
-      // // vue
-      // {
-      //   test: /\.vue$/,
-      //   loader: "vue-loader",
-      //   options: {
-      //     compilerOptions: {
-      //       preserveWhitespace: true
-      //     }
-      //   }
-      // },
+      // vue
+      {
+        test: /\.vue$/,
+        loader: "vue-loader",
+        options: {
+          compilerOptions: {
+            preserveWhitespace: true
+          }
+        }
+      },
       {
         test: /\.(ico|png|jpe?g|gif|svg)$/,
         loader: "url-loader",
@@ -76,31 +76,31 @@ exports.config = {
           limit: 8192,
           name: "fonts/[name]_[hash:7].[ext]"
         }
-      },
-      {
-        test: /\.vue$/,
-        loader: "vue-loader",
-        options: {
-          compilerOptions: {
-            preserveWhitespace: true
-          },
-          loaders: {
-            ts: "ts-loader",
-            tsx: "babel-loader!ts-loader"
-          }
-        }
-      },
-      {
-        test: /\.tsx?$/,
-        exclude: /node_modules/,
-        use: [
-          "babel-loader",
-          {
-            loader: "ts-loader",
-            options: { appendTsxSuffixTo: [/\.vue$/] }
-          }
-        ]
       }
+      // {
+      //   test: /\.vue$/,
+      //   loader: "vue-loader",
+      //   options: {
+      //     compilerOptions: {
+      //       preserveWhitespace: true
+      //     },
+      //     loaders: {
+      //       ts: "ts-loader",
+      //       tsx: "babel-loader!ts-loader"
+      //     }
+      //   }
+      // },
+      // {
+      //   test: /\.tsx?$/,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     "babel-loader",
+      //     {
+      //       loader: "ts-loader",
+      //       options: { appendTsxSuffixTo: [/\.vue$/] }
+      //     }
+      //   ]
+      // }
     ]
   },
   plugins,
