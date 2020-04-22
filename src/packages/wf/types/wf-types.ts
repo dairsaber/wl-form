@@ -15,5 +15,6 @@ export enum FormItemType {
   textarea = "textarea",
   checkbox = "checkbox",
   switch = "switch",
-  checkboxGroup = "checkboxGroup"
+  checkboxGroup = "checkboxGroup",
+  custom = "custom"
 }

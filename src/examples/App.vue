@@ -12,6 +12,32 @@
       <w-form-item :delegate="delegate" :config="getConfig('text2')" />
       <w-form-item :delegate="delegate" :config="getConfig('text3')" />
       <w-form-item :delegate="delegate" :config="getConfig('switch')" />
+      <!-- 自定义写法 -->
+      <w-form-item
+        :delegate="delegate"
+        :config="getConfig('custom')"
+        v-slot="{ setValue, value }"
+      >
+        <div style="width:100%;display:flex">
+          <AInput
+            style="flex:1"
+            :value="value"
+            @change="
+              ({ target: { value } }) => {
+                setValue(value);
+              }
+            "
+          />
+          <a-button
+            @click="
+              () => {
+                setValue(undefined);
+              }
+            "
+            >清空</a-button
+          >
+        </div>
+      </w-form-item>
     </w-form>
     <AButton @click="handleSetStatus">给text3设置永久状态</AButton>
     <AButton @click="handleClearStatus">给text设置状态</AButton>
@@ -24,7 +50,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Test from "./components/Test";
-import { Icon, Button } from "ant-design-vue";
+import { Icon, Button, Input } from "ant-design-vue";
 import { VNode } from "vue";
 enum FormItemType {
   text = "text",
@@ -37,7 +63,8 @@ enum FormItemType {
   textarea = "textarea",
   checkbox = "checkbox",
   switch = "switch",
-  checkboxGroup = "checkboxGroup"
+  checkboxGroup = "checkboxGroup",
+  custom = "custom"
 }
 enum FormStatusType {
   error = "error",
@@ -58,6 +85,16 @@ function configFunc(context: Vue): wform.FormConfig {
         labelCol: { span: 3 },
         wrapperCol: { span: 20 },
         hasFeedback: true
+      }
+    },
+    custom: {
+      type: FormItemType.custom,
+      label: "custom",
+      required: true,
+      tip: "请输入正确的数据",
+      props: {
+        labelCol: { span: 3 },
+        wrapperCol: { span: 20 }
       }
     },
     text2: {
@@ -110,7 +147,8 @@ function configFunc(context: Vue): wform.FormConfig {
 @Component({
   components: {
     Test,
-    AButton: Button
+    AButton: Button,
+    AInput: Input
   }
 })
 // eslint-disable no-undef
