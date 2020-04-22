@@ -18,8 +18,9 @@
         :config="getConfig('custom')"
         v-slot="{ setValue, value }"
       >
-        <div style="width:100%;display:flex">
+        <div style="width:100%;display:flex;margin-top:4px">
           <AInput
+            size="small"
             style="flex:1"
             :value="value"
             @change="
