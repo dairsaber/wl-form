@@ -1,7 +1,10 @@
 import { VueConstructor } from "vue/types/vue";
 import { VNode } from "vue";
 import { ColSpanType } from "ant-design-vue/types/grid/col";
-import { FormItemType as formItemType, FormStatusType as formStatusType } from "./wf-types";
+import {
+  FormItemType as formItemType,
+  FormStatusType as formStatusType
+} from "./wf-types";
 declare global {
   namespace common {
     export type Components = { [key: string]: VueConstructor };
@@ -114,7 +117,7 @@ declare global {
       resetValues: () => boolean;
       getValue: <T = any>(key: string) => T;
       getValues: (keys?: string[]) => CommonProp;
-      setStatus: (key: string, obj: StatusMessage) => void;
+      setStatus: (key: string, obj: StatusMessage, permanent?: boolean) => void;
       getValueWithValidate: (keys: string) => Promise<FormItemValue<any>>;
       setValuesWithValidate: (obj: CommonProp) => void;
       setValueWithValidate: (key: string, value: any) => Promise<boolean>;
@@ -156,7 +159,7 @@ declare global {
       setValueWithValidate: (value: any) => Promise<boolean>;
       getDefaultValue: () => any;
       getValue: () => any;
-      setStatusMessage: (obj: StatusMessage) => void;
+      setStatusMessage: (obj: StatusMessage, permanent?: boolean) => void;
     }
     export type StatusMessage = {
       status: FormStatusType | null;

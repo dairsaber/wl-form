@@ -178,9 +178,9 @@ export default class WForm extends Vue implements wform.FormController {
     return currentFormItem.methods.getValueWithValidate();
   }
   //此方法放到异步栈中节省资源消耗 所以用async
-  async setStatus(key: string, obj: wform.StatusMessage) {
+  async setStatus(key: string, obj: wform.StatusMessage, permanent?: boolean) {
     const currentFormItem = this.formMap[key];
-    currentFormItem.methods.setStatusMessage(obj);
+    currentFormItem.methods.setStatusMessage(obj, permanent);
   }
   // 提交并获取表单所以字段的值 并校验
   async submit<T>(): Promise<wform.FormValue<T>> {

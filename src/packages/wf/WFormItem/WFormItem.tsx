@@ -49,6 +49,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   private currentDisabled = false;
   private currentStatus: wform.FormStatusType | null = null;
   private isNormalChangeFunc = true;
+  private defaultStatus: FormStatusType | null = null;
+  private defaultMessage: string | VNode | null = null;
   private changeFunc({ target: { value } }: any) {
     this.setDebounceValue(value);
     this.onValueChange();
@@ -115,10 +117,12 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   }
   // 当前控件的状态
   get status(): wform.StatusMessage {
-    const currentStatus = this.isShowStatus ? this.currentStatus : null;
+    const currentStatus = this.isShowStatus
+      ? this.currentStatus
+      : this.defaultStatus;
     return {
       status: currentStatus,
-      message: this.isShowStatus ? this.currentMessage : null
+      message: this.isShowStatus ? this.currentMessage : this.defaultMessage
     };
   }
   //设值
@@ -215,10 +219,14 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       this.onValidate();
     }, 300);
   }
-  setStatusMessage(obj: wform.StatusMessage) {
+  setStatusMessage(obj: wform.StatusMessage, permanent?: boolean) {
     this.isShowStatus = true;
     this.currentMessage = obj.message;
     this.currentStatus = obj.status;
+    if (permanent) {
+      this.defaultStatus = obj.status;
+      this.defaultMessage = obj.message;
+    }
   }
   // 发射change事件
   @Emit("input")
