@@ -8,14 +8,14 @@ import {
   Select,
   Switch,
   DatePicker,
-  Radio
+  Radio,
+  Checkbox
 } from "ant-design-vue";
 import { ScopedSlotChildren } from "vue/types/vnode";
 import { Debounce } from "aftool";
 import { FormItemType, FormStatusType } from "../types/wf-types";
 
 const myDebounce = new Debounce();
-const defaultInputStyle = { width: "100%" };
 const NodeMap: { [key: string]: any } = {
   [FormItemType.text]: Input,
   [FormItemType.textarea]: Input.TextArea,
@@ -25,8 +25,15 @@ const NodeMap: { [key: string]: any } = {
   [FormItemType.date]: DatePicker,
   [FormItemType.week]: DatePicker.WeekPicker,
   [FormItemType.month]: DatePicker.MonthPicker,
-  [FormItemType.radio]: Radio.Group
+  [FormItemType.radio]: Radio.Group,
+  [FormItemType.checkbox]: Checkbox
 };
+const defaultInputStyle = (type: FormItemType): any => {
+  const noStyleTypes = [FormItemType.checkbox, FormItemType.switch];
+  if (noStyleTypes.includes(type)) return {};
+  return { width: "100%" };
+};
+
 @Component
 export default class WFormItem extends Vue implements wform.FormItemMethods {
   @Prop({ type: Object, required: true })
@@ -282,10 +289,12 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     return this.$createElement(
       NodeMap[config.type],
       {
-        style: defaultInputStyle,
+        style: defaultInputStyle(config.type),
         props: {
           defaultValue,
+          defaultChecked: defaultValue,
           value,
+          checked: value,
           placeholder: this.config.placeholder,
           ...this.config.childProps
         },

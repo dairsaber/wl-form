@@ -11,11 +11,13 @@
       <w-form-item :delegate="delegate" :config="getConfig('textarea')" />
       <w-form-item :delegate="delegate" :config="getConfig('text2')" />
       <w-form-item :delegate="delegate" :config="getConfig('text3')" />
+      <w-form-item :delegate="delegate" :config="getConfig('switch')" />
     </w-form>
     <AButton @click="handleSetStatus">给text3设置永久状态</AButton>
     <AButton @click="handleClearStatus">给text设置状态</AButton>
     <AButton @click="handleSubmit">获取值</AButton>
     <AButton @click="handleSetValues">设置值</AButton>
+    <AButton @click="handleSetValuesWithValidate">设置一坨值并校验</AButton>
     <p>{{ currentValue }}</p>
   </div>
 </template>
@@ -73,6 +75,14 @@ function configFunc(context: Vue): wform.FormConfig {
       label: "text3",
       required: true,
       tip: "请输入正确的数据",
+      props: {
+        labelCol: { span: 3 },
+        wrapperCol: { span: 20 }
+      }
+    },
+    switch: {
+      type: FormItemType.switch,
+      label: "switch",
       props: {
         labelCol: { span: 3 },
         wrapperCol: { span: 20 }
@@ -145,6 +155,34 @@ export default class App extends Vue {
         textxxx: "dsds"
       });
     }
+  }
+  private handleSetValuesWithValidate() {
+    if (this.form) {
+      this.form.setValuesWithValidate({
+        text4: this.randomString(),
+        text: this.randomString(),
+        text2: this.randomString(),
+        text3: this.randomString(),
+        textarea: this.randomString(),
+        textxxx: this.randomString(),
+        switch: Math.random() > 0.5
+      });
+    }
+  }
+  private randomString() {
+    const list = [
+      "23333...",
+      "擦擦擦擦擦擦...",
+      "你有病吧",
+      "你才有病",
+      "脑子里有屎",
+      "滚",
+      "呵呵哒",
+      "你妹的",
+      undefined
+    ];
+    const length = list.length;
+    return list[Math.floor(Math.random() * length)];
   }
 }
 </script>
