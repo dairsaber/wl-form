@@ -10,7 +10,9 @@
       <w-form-item :delegate="delegate" :config="getConfig('text')" />
       <w-form-item :delegate="delegate" :config="getConfig('textarea')" />
       <w-form-item :delegate="delegate" :config="getConfig('text2')" />
+      <w-form-item :delegate="delegate" :config="getConfig('text3')" />
     </w-form>
+    <AButton @click="handleSetStatus">给text3设置永久状态</AButton>
     <AButton @click="handleClearStatus">给text设置状态</AButton>
     <AButton @click="handleSubmit">获取值</AButton>
     <AButton @click="handleSetValues">设置值</AButton>
@@ -66,6 +68,16 @@ function configFunc(context: Vue): wform.FormConfig {
         wrapperCol: { span: 20 }
       }
     },
+    text3: {
+      type: FormItemType.text,
+      label: "text3",
+      required: true,
+      tip: "请输入正确的数据",
+      props: {
+        labelCol: { span: 3 },
+        wrapperCol: { span: 20 }
+      }
+    },
     textarea: {
       type: FormItemType.textarea,
       label: "textarea",
@@ -110,6 +122,18 @@ export default class App extends Vue {
         status: FormStatusType.warning,
         message: "草草草草....."
       });
+    }
+  }
+  private handleSetStatus(): void {
+    if (this.form) {
+      this.form.setStatus(
+        "text3",
+        {
+          status: FormStatusType.warning,
+          message: "草草草草....."
+        },
+        true
+      );
     }
   }
   private handleSetValues(): void {

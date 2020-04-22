@@ -83,8 +83,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     if (value) {
       this.currentStatus = FormStatusType.error;
     } else {
-      this.currentStatus = FormStatusType.success;
-      this.currentMessage = null;
+      this.currentStatus = this.defaultStatus || FormStatusType.success;
+      this.currentMessage = this.defaultMessage;
     }
   }
   get hasError(): boolean {
@@ -185,8 +185,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     }
     if (this.config.validate) {
       this.currentStatus = FormStatusType.validating;
-      this.currentMessage = await this.config.validate(this.currentValue);
-      this.hasError = this.currentMessage !== null;
+      const message = await this.config.validate(this.currentValue);
+      this.hasError = message !== null;
+      this.currentMessage = message;
     } else {
       this.hasError = false;
     }
