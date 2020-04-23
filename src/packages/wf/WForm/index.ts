@@ -1,3 +1,3 @@
-import WlForm from "./WForm"
-export { WlForm }
-export default WlForm
+import WlForm from "./WForm";
+export { WlForm };
+export default WlForm;

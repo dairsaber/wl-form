@@ -1,12 +1,12 @@
 {
   "name": "wl-form",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": false,
-  "main": "dist/wf.umd.min.js",
+  "main": "dist/wlForm.umd.min.js",
   "typings": "types/index.d.ts",
   "files": [
-    "dist/wf.umd.min.js",
-    "dist/wf.css",
+    "dist/wlForm.umd.min.js",
+    "dist/wlForm.css",
     "types/*",
     "package.json",
     "README.md"
@@ -14,7 +14,7 @@
   "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name wf src/packages/install.ts",
+    "build": "vue-cli-service build --target lib --name wlForm src/packages/install.ts",
     "build-prod": "webpack --config build/webpack.prod.js --progress --hide-modules "
   },
   "dependencies": {
