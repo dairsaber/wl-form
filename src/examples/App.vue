@@ -1,19 +1,19 @@
 <template>
   <div id="app">
     <Test />
-    <w-form
+    <wl-form
       :defaultValues="{}"
       :configFunc="configFunc"
       v-slot="{ delegate, getConfig }"
       :createForm="createForm"
     >
-      <w-form-item :delegate="delegate" :config="getConfig('text')" />
-      <w-form-item :delegate="delegate" :config="getConfig('textarea')" />
-      <w-form-item :delegate="delegate" :config="getConfig('text2')" />
-      <w-form-item :delegate="delegate" :config="getConfig('text3')" />
-      <w-form-item :delegate="delegate" :config="getConfig('switch')" />
+      <wl-form-item :delegate="delegate" :config="getConfig('text')" />
+      <wl-form-item :delegate="delegate" :config="getConfig('textarea')" />
+      <wl-form-item :delegate="delegate" :config="getConfig('text2')" />
+      <wl-form-item :delegate="delegate" :config="getConfig('text3')" />
+      <wl-form-item :delegate="delegate" :config="getConfig('switch')" />
       <!-- 自定义写法 -->
-      <w-form-item
+      <wl-form-item
         :delegate="delegate"
         :config="getConfig('custom')"
         v-slot="{ setValue, value }"
@@ -37,8 +37,8 @@
             >清空</a-button
           >
         </div>
-      </w-form-item>
-    </w-form>
+      </wl-form-item>
+    </wl-form>
     <AButton @click="handleSetStatus">给text3设置永久状态</AButton>
     <AButton @click="handleClearStatus">给text设置状态</AButton>
     <AButton @click="handleSubmit">获取值</AButton>
