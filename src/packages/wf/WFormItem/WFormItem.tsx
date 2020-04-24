@@ -193,7 +193,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     if (this.config.validate) {
       this.currentStatus = FormStatusType.validating;
       const message = await this.config.validate(this.currentValue);
-      this.hasError = message !== null;
+      this.hasError = !!message;
       this.currentMessage = message;
     } else {
       this.hasError = false;

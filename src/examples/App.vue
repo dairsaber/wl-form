@@ -20,7 +20,6 @@
       >
         <div style="width:100%;display:flex;margin-top:4px">
           <AInput
-            size="small"
             style="flex:1"
             :value="value"
             @change="
@@ -96,6 +95,12 @@ function configFunc(context: Vue): wform.FormConfig {
       props: {
         labelCol: { span: 3 },
         wrapperCol: { span: 20 }
+      },
+      validate: (value: any) => {
+        if (value !== "呵呵哒") {
+          return "该值不是'呵呵哒'";
+        }
+        return null;
       }
     },
     text2: {
