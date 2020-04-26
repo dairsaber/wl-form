@@ -1,6 +1,6 @@
 {
   "name": "wl-form",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "private": false,
   "main": "dist/wlForm.umd.min.js",
   "typings": "types/index.d.ts",
@@ -9,7 +9,8 @@
     "dist/wlForm.css",
     "types/*",
     "package.json",
-    "README.md"
+    "README.md",
+    "readme"
   ],
   "license": "MIT",
   "scripts": {

@@ -12,6 +12,12 @@
       <wl-form-item :delegate="delegate" :config="getConfig('text2')" />
       <wl-form-item :delegate="delegate" :config="getConfig('text3')" />
       <wl-form-item :delegate="delegate" :config="getConfig('switch')" />
+      <wl-form-item
+        :delegate="delegate"
+        :config="getConfig('select')"
+        :options="['滚蛋', '滚犊子', '去你大爷的']"
+        :renderItem="renderSelect"
+      />
       <!-- 自定义写法 -->
       <wl-form-item
         :delegate="delegate"
@@ -50,7 +56,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Test from "./components/Test";
-import { Icon, Button, Input } from "ant-design-vue";
+import { Icon, Button, Input, Select } from "ant-design-vue";
 import { VNode } from "vue";
 enum FormItemType {
   text = "text",
@@ -72,6 +78,21 @@ enum FormStatusType {
   warning = "warning",
   validating = "validating"
 }
+/**
+ * 配置项 自己去看 FormConfig 定义
+ *   key?: string;
+ *   type: FormItemType;
+ *   placeholder?: string;
+ *   required?: boolean;
+ *   tip?: setTip | string;
+ *   label?: string | VNode;
+ *   props?: FormProps; //{layout hasFeedback ...}
+ *   defaultValue?: any;
+ *   validate?: validateFunc;
+ *   childProps?: CommonProp;
+ *   filterFunc?: <T = any>(value: T) => T; 表单值 --过滤 --> 拿到的值
+ *   formatFunc?: <T = any>(value: T) => T; 初始值 --格式化 --> 表单显示值
+ */
 function configFunc(context: Vue): wform.FormConfig {
   const h = context.$createElement;
   return {
@@ -97,8 +118,8 @@ function configFunc(context: Vue): wform.FormConfig {
         wrapperCol: { span: 20 }
       },
       validate: (value: any) => {
-        if (value !== "呵呵哒") {
-          return "该值不是'呵呵哒'";
+        if (value !== "滚") {
+          return "该值不是'滚'";
         }
         return null;
       }
@@ -116,6 +137,16 @@ function configFunc(context: Vue): wform.FormConfig {
     text3: {
       type: FormItemType.text,
       label: "text3",
+      required: true,
+      tip: "请输入正确的数据",
+      props: {
+        labelCol: { span: 3 },
+        wrapperCol: { span: 20 }
+      }
+    },
+    select: {
+      type: FormItemType.select,
+      label: "select",
       required: true,
       tip: "请输入正确的数据",
       props: {
@@ -165,6 +196,31 @@ export default class App extends Vue {
   private createForm(formController: wform.FormController) {
     this.form = formController;
   }
+  /**
+   *  具体的操作api 看wform.FormController 的定义
+   *  submit: <T = CommonProp>() => Promise<FormValue<T>>; //这是异步的
+   *  getFormMap: () => CommonProp;
+   *  setValues: (values: CommonProp) => void;
+   *  clearValues: () => boolean;
+   *  resetValues: () => boolean;
+   *  getValue: <T = any>(key: string) => T;
+   *  getValues: (keys?: string[]) => CommonProp;
+   *  setStatus: (key: string, obj: StatusMessage, permanent?: boolean) => void;
+   *  getValueWithValidate: (keys: string) => Promise<FormItemValue<any>>;
+   *  setValuesWithValidate: (obj: CommonProp) => void;
+   *  setValueWithValidate: (key: string, value: any) => Promise<boolean>;
+   *  setDefaultValue: (key: string, value: any) => void;
+   *  validate: (key?: string) => Promise<boolean>;
+   * 解释
+   * resetValues-->重置成默认值
+   * clearValues-->清除所有表单数据
+   * getValues--> 批量获取值 参数[...字段]
+   * async getValuesWithValidate --> 获取值并校验
+   * getValue(key) --> 获取目标值
+   * async submit --> 提价and校验 返回{error,values}的结构 验证有误的情况下 error是true
+   * setStatus(key,{status,message},isDefault) -->手动设置状态 有时候设置warn效果不错可以起到提示的作用
+   * setDefaultValue(key,value) -->设置更改一个控件的默认值
+   */
   private async handleSubmit() {
     if (this.form) {
       this.currentValue = await this.form.submit();
@@ -174,7 +230,7 @@ export default class App extends Vue {
     if (this.form) {
       this.form.setStatus("text", {
         status: FormStatusType.warning,
-        message: "草草草草....."
+        message: "花里胡哨的......"
       });
     }
   }
@@ -184,11 +240,18 @@ export default class App extends Vue {
         "text3",
         {
           status: FormStatusType.warning,
-          message: "草草草草....."
+          message: "花里胡哨的......"
         },
-        true
+        true //这个状态作为默认状态
       );
     }
+  }
+  private renderSelect(item: string) {
+    return this.$createElement(
+      Select.Option,
+      { props: { key: { item } } },
+      item
+    );
   }
   private handleSetValues(): void {
     if (this.form) {
@@ -217,12 +280,12 @@ export default class App extends Vue {
     const list = [
       "23333...",
       "擦擦擦擦擦擦...",
-      "你有病吧",
-      "你才有病",
-      "脑子里有屎",
+      "我是一直来自北方的浪",
+      "我看到一个非常搞笑的人在天上飞翔...",
+      "时间长了脑子也变成了翔",
       "滚",
       "呵呵哒",
-      "你妹的",
+      "唉,...................",
       undefined
     ];
     const length = list.length;
