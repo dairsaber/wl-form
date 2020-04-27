@@ -7,7 +7,7 @@
       v-slot="{ delegate, getConfig }"
       :createForm="createForm"
     >
-      <wl-form-item :delegate="delegate" :config="getConfig('text')" />
+      <wl-form-item disabled :delegate="delegate" :config="getConfig('text')" />
       <wl-form-item :delegate="delegate" :config="getConfig('textarea')" />
       <wl-form-item :delegate="delegate" :config="getConfig('text2')" />
       <wl-form-item :delegate="delegate" :config="getConfig('text3')" />
@@ -247,11 +247,7 @@ export default class App extends Vue {
     }
   }
   private renderSelect(item: string) {
-    return this.$createElement(
-      Select.Option,
-      { props: { key: { item } } },
-      item
-    );
+    return this.$createElement(Select.Option, { key: item }, item);
   }
   private handleSetValues(): void {
     if (this.form) {

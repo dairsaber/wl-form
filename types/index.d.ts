@@ -170,6 +170,7 @@ declare global {
       config: FormConfigItem;
       value: any;
       defaultValue: any;
+      disabled?: boolean;
     };
     export type RenderItemFunc = {
       (item: any): VNode;

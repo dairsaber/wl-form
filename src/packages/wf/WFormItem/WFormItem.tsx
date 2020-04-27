@@ -248,6 +248,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     const value = this.currentValue;
     const config = this.config;
     const defaultValue = this.currentDefaultValue;
+    const disabled = this.currentDisabled;
     const scopedSlotFunc = this.$scopedSlots["default"];
     if (scopedSlotFunc) {
       return scopedSlotFunc({
@@ -259,7 +260,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     const params: wform.ControllerRenderParams = {
       config,
       value,
-      defaultValue
+      defaultValue,
+      disabled
     };
     switch (this.config.type) {
       case FormItemType.radio:
@@ -284,7 +286,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   }
   // 获取基本空间
   getFormInput(
-    { config, value, defaultValue }: wform.ControllerRenderParams,
+    { config, value, defaultValue, disabled }: wform.ControllerRenderParams,
     children: VNode[] | ScopedSlotChildren = []
   ): VNode {
     return this.$createElement(
@@ -292,6 +294,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       {
         style: defaultInputStyle(config.type),
         props: {
+          disabled,
           defaultValue,
           defaultChecked: defaultValue,
           value,
@@ -316,7 +319,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   renderOptionsController({
     config,
     value,
-    defaultValue
+    defaultValue,
+    disabled
   }: wform.ControllerRenderParams): VNode {
     const options: any[] = this.options as any[];
     let optionVNodes: any[] = [];
@@ -325,9 +329,15 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
         if (this.renderItem) return this.renderItem(optionItem);
       });
     }
-    return this.getFormInput({ config, value, defaultValue }, optionVNodes);
+    return this.getFormInput(
+      { config, value, defaultValue, disabled },
+      optionVNodes
+    );
   }
-
+  @Watch("disabled", { immediate: true })
+  disabledWatch(val = false) {
+    this.currentDisabled = val;
+  }
   @Watch("config.defaultValue", { immediate: true })
   watchDefaultValues(val: wform.FormConfigItem) {
     this.currentDefaultValue = val;

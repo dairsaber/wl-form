@@ -217,7 +217,9 @@ export default class WForm extends Vue implements wform.FormController {
     currentFormItem && currentFormItem.methods.setDefaultValue(value);
   }
   delegate(formItemInfo: wform.FormItemInfo) {
-    formItemInfo.methods.setDisabled(this.disabled);
+    if (this.disabled) {
+      formItemInfo.methods.setDisabled(this.disabled);
+    }
     const key = formItemInfo.config.key;
     if (key) {
       this.formMap[key] = formItemInfo;

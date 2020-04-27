@@ -1,6 +1,6 @@
 {
   "name": "wl-form",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "private": false,
   "main": "dist/wlForm.umd.min.js",
   "typings": "types/index.d.ts",
