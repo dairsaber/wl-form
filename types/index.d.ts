@@ -123,6 +123,9 @@ declare global {
       setValueWithValidate: (key: string, value: any) => Promise<boolean>;
       setDefaultValue: (key: string, value: any) => void;
       validate: (key?: string) => Promise<boolean>;
+      setDisabled: (obj: { [key: string]: boolean }) => void;
+      disableAll: () => void;
+      enableAll: () => void;
     }
 
     /**

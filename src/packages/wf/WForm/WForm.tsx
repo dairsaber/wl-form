@@ -75,7 +75,10 @@ export default class WForm extends Vue implements wform.FormController {
       validate: this.validate,
       setValuesWithValidate: this.setValuesWithValidate,
       getValueWithValidate: this.getValueWithValidate,
-      setValueWithValidate: this.setValueWithValidate
+      setValueWithValidate: this.setValueWithValidate,
+      setDisabled: this.setDisabled,
+      disableAll: this.disableAll,
+      enableAll: this.enableAll
     });
   }
   //获得表单控件操作对象数组
@@ -110,6 +113,16 @@ export default class WForm extends Vue implements wform.FormController {
         const newValue = getFilterValue(currentFormItem.config, obj[x]);
         currentFormItem.methods.setValue(newValue);
       }
+    });
+  }
+  disableAll() {
+    Object.values(this.formMap).forEach(formItem => {
+      formItem.methods.setDisabled(true);
+    });
+  }
+  enableAll() {
+    Object.values(this.formMap).forEach(formItem => {
+      formItem.methods.setDisabled(false);
     });
   }
   //设置值并校验
@@ -215,6 +228,12 @@ export default class WForm extends Vue implements wform.FormController {
   setDefaultValue(key: string, value: any) {
     const currentFormItem = this.formMap[key];
     currentFormItem && currentFormItem.methods.setDefaultValue(value);
+  }
+  setDisabled(obj: { [key: string]: boolean } = {}) {
+    Object.keys(obj).forEach(key => {
+      const currentFormItem = this.formMap[key];
+      currentFormItem && currentFormItem.methods.setDisabled(obj[key]);
+    });
   }
   delegate(formItemInfo: wform.FormItemInfo) {
     if (this.disabled) {

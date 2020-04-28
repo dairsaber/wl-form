@@ -253,7 +253,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     if (scopedSlotFunc) {
       return scopedSlotFunc({
         setValue: this.setDebounceValue,
-        value
+        value,
+        disabled
       });
     }
     let currentController: VNode;
