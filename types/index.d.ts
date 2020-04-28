@@ -126,6 +126,7 @@ declare global {
       setDisabled: (obj: { [key: string]: boolean }) => void;
       disableAll: () => void;
       enableAll: () => void;
+      setOptions: (obj: { [key: string]: any[] }) => void;
     }
 
     /**

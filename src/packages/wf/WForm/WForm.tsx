@@ -78,7 +78,17 @@ export default class WForm extends Vue implements wform.FormController {
       setValueWithValidate: this.setValueWithValidate,
       setDisabled: this.setDisabled,
       disableAll: this.disableAll,
-      enableAll: this.enableAll
+      enableAll: this.enableAll,
+      setOptions: this.setOptions
+    });
+  }
+  setOptions(obj: { [key: string]: any[] }) {
+    const keys = Object.keys(obj || {});
+    keys.forEach(x => {
+      const currentFormItem = this.formMap[x];
+      if (currentFormItem) {
+        currentFormItem.methods.setOptions(obj[x]);
+      }
     });
   }
   //获得表单控件操作对象数组
