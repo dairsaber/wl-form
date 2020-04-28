@@ -162,6 +162,7 @@ declare global {
       setValueWithValidate: (value: any) => Promise<boolean>;
       getDefaultValue: () => any;
       getValue: () => any;
+      setOptions: (val: any[]) => void;
       setStatusMessage: (obj: StatusMessage, permanent?: boolean) => void;
     }
     export type StatusMessage = {
@@ -174,6 +175,7 @@ declare global {
       value: any;
       defaultValue: any;
       disabled?: boolean;
+      options?: any[];
     };
     export type RenderItemFunc = {
       (item: any): VNode;

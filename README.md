@@ -2,6 +2,8 @@
 
 ### 更新
 
+- "version": "0.2.9" ->
+  - 添加 setOptions 动态设置 select/radio 的 options
 - "version": "0.2.8" ->
   - 添加 setDisabled 方法 动态禁用表单
   - 添加 disableAll 方法 动态禁用所有字段(非自定义)

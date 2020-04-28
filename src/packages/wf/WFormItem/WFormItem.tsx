@@ -58,6 +58,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   private isNormalChangeFunc = true;
   private defaultStatus: FormStatusType | null = null;
   private defaultMessage: string | VNode | null = null;
+  private currentOptions: any[] = [];
   private changeFunc({ target: { value } }: any) {
     this.setDebounceValue(value);
     this.onValueChange();
@@ -81,7 +82,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
           getValueWithValidate: this.getValueWithValidate,
           setValueWithValidate: this.setValueWithValidate,
           getDefaultValue: this.getDefaultValue,
-          setStatusMessage: this.setStatusMessage
+          setStatusMessage: this.setStatusMessage,
+          setOptions: this.setOptions
         }
       });
   }
@@ -236,6 +238,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       this.defaultMessage = obj.message;
     }
   }
+  setOptions(value: any[]) {
+    this.currentOptions = value;
+  }
   // 发射change事件
   @Emit("input")
   @Emit("change")
@@ -250,6 +255,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     const defaultValue = this.currentDefaultValue;
     const disabled = this.currentDisabled;
     const scopedSlotFunc = this.$scopedSlots["default"];
+    const options = this.currentOptions;
     if (scopedSlotFunc) {
       return scopedSlotFunc({
         setValue: this.setDebounceValue,
@@ -262,7 +268,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       config,
       value,
       defaultValue,
-      disabled
+      disabled,
+      options
     };
     switch (this.config.type) {
       case FormItemType.radio:
@@ -321,9 +328,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     config,
     value,
     defaultValue,
-    disabled
+    disabled,
+    options = []
   }: wform.ControllerRenderParams): VNode {
-    const options: any[] = this.options as any[];
     let optionVNodes: any[] = [];
     if (this.renderItem) {
       optionVNodes = options.map(optionItem => {
@@ -338,6 +345,12 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   @Watch("disabled", { immediate: true })
   disabledWatch(val = false) {
     this.currentDisabled = val;
+  }
+  @Watch("options", { immediate: true })
+  optionsWatch(val?: any[]) {
+    if (val) {
+      this.currentOptions = val;
+    }
   }
   @Watch("config.defaultValue", { immediate: true })
   watchDefaultValues(val: wform.FormConfigItem) {
