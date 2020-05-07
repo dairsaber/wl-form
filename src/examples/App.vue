@@ -50,6 +50,7 @@
     <AButton @click="handleSubmit">获取值</AButton>
     <AButton @click="handleSetValues">设置值</AButton>
     <AButton @click="handleSetValuesWithValidate">设置一坨值并校验</AButton>
+    <AButton @click="toogleControllers">隐藏或显示某些控件</AButton>
     <p>{{ currentValue }}</p>
   </div>
 </template>
@@ -268,6 +269,14 @@ export default class App extends Vue {
         text3: this.randomString(),
         textarea: this.randomString(),
         textxxx: this.randomString(),
+        switch: Math.random() > 0.5
+      });
+    }
+  }
+  private toogleControllers() {
+    if (this.form) {
+      this.form.hide({
+        textarea: Math.random() > 0.5,
         switch: Math.random() > 0.5
       });
     }

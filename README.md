@@ -2,6 +2,8 @@
 
 ### 更新
 
+- "version": "0.3.1" ->
+  - 添加 hide 方法 隐藏/显示一个或多个控件 参数 {[key:string]:boolean}
 - "version": "0.3.0" ->
   - 修复 bug
 - "version": "0.2.9" ->

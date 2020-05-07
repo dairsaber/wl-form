@@ -79,9 +79,21 @@ export default class WForm extends Vue implements wform.FormController {
       setDisabled: this.setDisabled,
       disableAll: this.disableAll,
       enableAll: this.enableAll,
-      setOptions: this.setOptions
+      setOptions: this.setOptions,
+      hide: this.hide
     });
   }
+  //隐藏控件
+  hide(obj: { [key: string]: boolean }) {
+    const keys = Object.keys(obj || {});
+    keys.forEach(x => {
+      const currentFormItem = this.formMap[x];
+      if (currentFormItem) {
+        currentFormItem.methods.hide(obj[x]);
+      }
+    });
+  }
+  //设置下拉选项 或者 有下拉选项的 options
   setOptions(obj: { [key: string]: any[] }) {
     const keys = Object.keys(obj || {});
     keys.forEach(x => {

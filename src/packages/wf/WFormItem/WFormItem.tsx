@@ -58,6 +58,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   private isNormalChangeFunc = true;
   private defaultStatus: FormStatusType | null = null;
   private defaultMessage: string | VNode | null = null;
+  private hidden = false;
   private currentOptions: any[] = [];
   private changeFunc({ target: { value } }: any) {
     this.setDebounceValue(value);
@@ -83,7 +84,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
           setValueWithValidate: this.setValueWithValidate,
           getDefaultValue: this.getDefaultValue,
           setStatusMessage: this.setStatusMessage,
-          setOptions: this.setOptions
+          setOptions: this.setOptions,
+          hide: this.hide
         }
       });
   }
@@ -241,6 +243,10 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   setOptions(value: any[]) {
     this.currentOptions = value;
   }
+  //隐藏
+  hide(val = true) {
+    this.hidden = val;
+  }
   // 发射change事件
   @Emit("input")
   @Emit("change")
@@ -357,8 +363,13 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     this.currentDefaultValue = val;
     this.currentControlValue = val;
   }
+  @Watch("config.hidden", { immediate: true })
+  watchHidden(val = false) {
+    this.hidden = val;
+  }
 
-  protected render(h: CreateElement): VNode {
+  protected render(h: CreateElement): VNode | null {
+    if (this.hidden) return null;
     //准备数据
     const { status, message } = this.status;
     const config = this.config;

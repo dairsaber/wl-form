@@ -127,6 +127,7 @@ declare global {
       disableAll: () => void;
       enableAll: () => void;
       setOptions: (obj: { [key: string]: any[] }) => void;
+      hide: (obj: { [key: string]: boolean }) => void;
     }
 
     /**
@@ -165,6 +166,7 @@ declare global {
       getValue: () => any;
       setOptions: (val: any[]) => void;
       setStatusMessage: (obj: StatusMessage, permanent?: boolean) => void;
+      hide: (isHidden: boolean) => void;
     }
     export type StatusMessage = {
       status: FormStatusType | null;
