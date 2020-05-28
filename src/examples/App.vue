@@ -2,7 +2,7 @@
   <div id="app">
     <Test />
     <wl-form
-      :defaultValues="{}"
+      :defaultValues="{ custom: '滚一边去' }"
       :configFunc="configFunc"
       v-slot="{ delegate, getConfig }"
       :createForm="createForm"
@@ -17,6 +17,15 @@
         :config="getConfig('select')"
         :options="['滚蛋', '滚犊子', '去你大爷的']"
         :renderItem="renderSelect"
+      />
+      <wl-form-item
+        :delegate="delegate"
+        :config="getConfig('radio')"
+        :options="[
+          { value: true, label: '是' },
+          { value: false, label: '非' }
+        ]"
+        :renderItem="renderRadio"
       />
       <!-- 自定义写法 -->
       <wl-form-item
@@ -57,7 +66,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Test from "./components/Test";
-import { Icon, Button, Input, Select } from "ant-design-vue";
+import { Icon, Button, Input, Select, Radio } from "ant-design-vue";
 import { VNode } from "vue";
 enum FormItemType {
   text = "text",
@@ -148,6 +157,16 @@ function configFunc(context: Vue): wform.FormConfig {
     select: {
       type: FormItemType.select,
       label: "select",
+      required: true,
+      tip: "请输入正确的数据",
+      props: {
+        labelCol: { span: 3 },
+        wrapperCol: { span: 20 }
+      }
+    },
+    radio: {
+      type: FormItemType.radio,
+      label: "radio",
       required: true,
       tip: "请输入正确的数据",
       props: {
@@ -249,6 +268,13 @@ export default class App extends Vue {
   }
   private renderSelect(item: string) {
     return this.$createElement(Select.Option, { key: item }, item);
+  }
+  private renderRadio(item: any) {
+    return this.$createElement(
+      Radio,
+      { key: item.value, props: { value: item.value } },
+      item.label
+    );
   }
   private handleSetValues(): void {
     if (this.form) {

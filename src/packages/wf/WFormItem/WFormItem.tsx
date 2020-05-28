@@ -172,6 +172,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     let isOk = true;
     if (this.config.required) {
       switch (true) {
+        case typeof this.currentValue === "number":
+        case typeof this.currentValue === "boolean":
+          break;
         case typeof this.currentValue === "string":
           isOk = !!this.currentValue.trim();
           break;
