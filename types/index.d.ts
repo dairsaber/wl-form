@@ -124,6 +124,7 @@ declare global {
       setDefaultValue: (key: string, value: any) => void;
       validate: (key?: string) => Promise<boolean>;
       setDisabled: (obj: { [key: string]: boolean }) => void;
+      setRequired: (obj: { [key: string]: boolean }) => void;
       disableAll: () => void;
       enableAll: () => void;
       setOptions: (obj: { [key: string]: any[] }) => void;
@@ -160,6 +161,7 @@ declare global {
       resetValue: () => any;
       onValidate: () => Promise<boolean>;
       setDisabled: (disabled: boolean) => void;
+      setRequired: (isRequired: boolean) => void;
       getValueWithValidate: () => Promise<FormItemValue<any>>;
       setValueWithValidate: (value: any) => Promise<boolean>;
       getDefaultValue: () => any;

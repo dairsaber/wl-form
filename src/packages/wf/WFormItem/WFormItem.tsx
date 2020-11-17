@@ -87,6 +87,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
         config: this.config,
         methods: {
           setValue: this.setValue,
+          setRequired: this.setRequired,
           setDefaultValue: this.setDefaultValue,
           resetValue: this.resetValue,
           onValidate: this.onValidate,
@@ -151,6 +152,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   get currentFormValue(): any {
     const value = this.currentValue || this.getFormDataValue();
     return value;
+  }
+  setRequired(isRequired: boolean) {
+    this.config = { ...this.config, required: isRequired };
   }
   getFormDataValue() {
     return this.rootComp.myFormData[this.config.key + ""];

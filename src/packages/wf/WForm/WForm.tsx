@@ -97,6 +97,7 @@ export default class WForm extends Vue implements wform.FormController {
       getValueWithValidate: this.getValueWithValidate,
       setValueWithValidate: this.setValueWithValidate,
       setDisabled: this.setDisabled,
+      setRequired: this.setRequired,
       disableAll: this.disableAll,
       enableAll: this.enableAll,
       setOptions: this.setOptions,
@@ -286,6 +287,12 @@ export default class WForm extends Vue implements wform.FormController {
     Object.keys(obj).forEach(key => {
       const currentFormItem = this.formMap[key];
       currentFormItem && currentFormItem.methods.setDisabled(obj[key]);
+    });
+  }
+  setRequired(obj: { [key: string]: boolean } = {}) {
+    Object.keys(obj).forEach(key => {
+      const currentFormItem = this.formMap[key];
+      currentFormItem && currentFormItem.methods.setRequired(obj[key]);
     });
   }
   delegate(formItemInfo: wform.FormItemInfo) {

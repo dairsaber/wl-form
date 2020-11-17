@@ -65,6 +65,7 @@
     <AButton @click="toogleControllers">隐藏或显示某些控件</AButton>
     <AButton @click="reset">重置</AButton>
     <AButton @click="setDefaultValue">改变默认值</AButton>
+    <AButton @click="setRequired">改变必填字段的状态</AButton>
     <AButton @click="clear">clear</AButton>
     <p>{{ currentValue }}</p>
   </div>
@@ -270,6 +271,11 @@ export default class App extends Vue {
   private setDefaultValue() {
     if (this.form) {
       this.form.setDefaultValue("custom", "wocacacacaca");
+    }
+  }
+  private setRequired() {
+    if (this.form) {
+      this.form.setRequired({ text: Math.random() > 0.5 });
     }
   }
   private clear() {
