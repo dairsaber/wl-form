@@ -247,7 +247,6 @@ export default class WForm extends Vue implements wform.FormController {
   // 提交并获取表单所以字段的值 并校验
   async submit<T>(): Promise<wform.FormValue<T>> {
     const keys = Object.keys(this.formMap);
-    console.log("this.formMap", this.formMap);
     let hasError = false;
     let result = {};
     for (let i = 0; i < keys.length; i++) {
@@ -296,7 +295,6 @@ export default class WForm extends Vue implements wform.FormController {
     });
   }
   delegate(formItemInfo: wform.FormItemInfo) {
-    console.log("formItemInfo", formItemInfo, formItemInfo.config.key);
     if (this.disabled) {
       formItemInfo.methods.setDisabled(this.disabled);
     }

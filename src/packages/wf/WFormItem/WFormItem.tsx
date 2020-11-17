@@ -409,7 +409,6 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     //准备数据
     const { status, message } = this.status;
     const config = this.config;
-    console.log("config", config);
     const inputController = this.inputController;
     return h(
       Form.Item,
