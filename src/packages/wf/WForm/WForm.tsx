@@ -1,4 +1,4 @@
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Provide } from "vue-property-decorator";
 import moment, { Moment } from "moment";
 import { VNode } from "vue";
 import { Spin, Empty } from "ant-design-vue";
@@ -58,6 +58,25 @@ export default class WForm extends Vue implements wform.FormController {
   readonly createForm!: (form: wform.FormController) => void;
   @Prop({ type: Boolean, default: false })
   readonly disabled!: boolean;
+  private myFormData: { [key: string]: any } = {
+    ...(this.defaultValues || {})
+  };
+  private myDefaultFormData: { [key: string]: any } = {
+    ...(this.defaultValues || {})
+  };
+  @Provide() private rootComp: any = this;
+  @Provide() private setDefaultFormData = (
+    obj: { [key: string]: any } = {}
+  ) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      this.myDefaultFormData[key] = value;
+    });
+  };
+  @Provide() private setFormData = (obj: { [key: string]: any } = {}) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      this.myFormData[key] = value;
+    });
+  };
 
   protected formMap: { [key: string]: wform.FormItemInfo } = {};
 
@@ -133,6 +152,7 @@ export default class WForm extends Vue implements wform.FormController {
       const currentFormItem = this.formMap[x];
       if (currentFormItem) {
         const newValue = getFilterValue(currentFormItem.config, obj[x]);
+        this.setFormData({ [x]: newValue });
         currentFormItem.methods.setValue(newValue);
       }
     });
@@ -154,6 +174,7 @@ export default class WForm extends Vue implements wform.FormController {
       const currentFormItem = this.formMap[x];
       if (currentFormItem) {
         const newValue = getFilterValue(currentFormItem.config, obj[x]);
+        this.setFormData({ [x]: newValue });
         currentFormItem.methods.setValueWithValidate(newValue);
       }
     });
@@ -163,6 +184,7 @@ export default class WForm extends Vue implements wform.FormController {
     const currentFormItem = this.formMap[key];
     if (currentFormItem) {
       const newValue = getFilterValue(currentFormItem.config, value);
+      this.setFormData({ [key]: newValue });
       currentFormItem.methods.setValue(newValue);
     }
   }
@@ -171,6 +193,7 @@ export default class WForm extends Vue implements wform.FormController {
     const currentFormItem = this.formMap[key];
     if (currentFormItem) {
       const newValue = getFilterValue(currentFormItem.config, value);
+      this.setFormData({ [key]: newValue });
       return await currentFormItem.methods.setValueWithValidate(newValue);
     }
     return false;
@@ -196,6 +219,7 @@ export default class WForm extends Vue implements wform.FormController {
   //清除值
   clearValues(): boolean {
     Object.keys(this.formMap).forEach(x => {
+      this.myFormData[x] = undefined;
       this.formMap[x].methods.setValue(undefined);
     });
     return true;
@@ -203,6 +227,7 @@ export default class WForm extends Vue implements wform.FormController {
   //重置表单值为默认值
   resetValues(): boolean {
     Object.keys(this.formMap).forEach(x => {
+      this.myFormData[x] = this.myDefaultFormData[x];
       this.formMap[x].methods.resetValue();
     });
     return true;
@@ -249,6 +274,8 @@ export default class WForm extends Vue implements wform.FormController {
   //设置默认值 并重置 表单值为当前默认值
   setDefaultValue(key: string, value: any) {
     const currentFormItem = this.formMap[key];
+    this.setDefaultFormData({ [key]: value });
+    this.setFormData({ [key]: value });
     currentFormItem && currentFormItem.methods.setDefaultValue(value);
   }
   setDisabled(obj: { [key: string]: boolean } = {}) {

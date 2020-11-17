@@ -1,4 +1,11 @@
-import { Vue, Component, Prop, Watch, Emit } from "vue-property-decorator";
+import {
+  Vue,
+  Component,
+  Prop,
+  Watch,
+  Emit,
+  Inject
+} from "vue-property-decorator";
 import { CreateElement } from "vue";
 import { VNode } from "vue";
 import {
@@ -46,7 +53,10 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   readonly options?: any;
   @Prop({ type: Function })
   readonly renderItem?: wform.RenderItemFunc;
-
+  @Inject("rootComp") private rootComp!: any;
+  @Inject("setFormData") private setFormData!: (obj?: {
+    [key: string]: any;
+  }) => void;
   //这边属性如果不付值的话将不会被注入vue的data中 大坑 而且不能赋值为undefined
   private currentDefaultValue: any = null;
   private currentControlValue: any = null;
@@ -118,13 +128,10 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       this.onValidate().then(validate => {
         r({
           error: !validate,
-          value: this.currentValue
+          value: this.currentFormValue
         });
       });
     });
-  }
-  set formValue(value) {
-    this.currentValue = value;
   }
   // 当前控件的状态
   get status(): wform.StatusMessage {
@@ -136,27 +143,37 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       message: this.isShowStatus ? this.currentMessage : this.defaultMessage
     };
   }
+  get currentFormValue(): any {
+    const value = this.currentValue || this.getFormDataValue();
+    return value;
+  }
+  getFormDataValue() {
+    return this.rootComp.myFormData[this.config.key + ""];
+  }
+  getDefaultFormDataValue() {
+    return this.rootComp.myDefaultFormData[this.config.key + ""];
+  }
   //设值
-  setValue(value: any) {
-    this.currentValue = value;
+  setValue() {
+    this.currentValue = this.getFormDataValue();
   }
   //获取值
   getValue(): any {
-    return this.currentValue;
+    return this.currentFormValue;
   }
   //设置默认值 这个会影响重置的时候表单控件值
-  setDefaultValue(value: any) {
-    this.currentDefaultValue = value;
+  setDefaultValue() {
+    this.currentDefaultValue = this.getDefaultFormDataValue();
     this.resetValue();
   }
   //获取默认值
   getDefaultValue(): any {
-    return this.currentDefaultValue;
+    return this.getDefaultFormDataValue();
   }
   // 重置控件值
   resetValue(): any {
     this.clearStatus();
-    this.currentValue = this.currentDefaultValue;
+    this.currentValue = this.getDefaultFormDataValue();
     return this.currentDefaultValue;
   }
   // 清除 表单校验状态 但是不重置 error状态 只是重置显示效果
@@ -172,20 +189,22 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     let isOk = true;
     if (this.config.required) {
       switch (true) {
-        case typeof this.currentValue === "number":
-        case typeof this.currentValue === "boolean":
+        case typeof this.currentFormValue === "number":
+        case typeof this.currentFormValue === "boolean":
           break;
-        case typeof this.currentValue === "string":
-          isOk = !!this.currentValue.trim();
+        case typeof this.currentFormValue === "string":
+          isOk = !!this.currentFormValue.trim();
           break;
-        case Array.isArray(this.currentValue):
-          isOk = !!this.currentValue.length;
+        case Array.isArray(this.currentFormValue):
+          isOk = !!this.currentFormValue.length;
           break;
-        case typeof this.currentValue === "object":
-          isOk = !!this.currentValue && !!Object.keys(this.currentValue).length;
+        case typeof this.currentFormValue === "object":
+          isOk =
+            !!this.currentFormValue &&
+            !!Object.keys(this.currentFormValue).length;
           break;
         default:
-          isOk = !!this.currentValue;
+          isOk = !!this.currentFormValue;
       }
     }
     if (!isOk) {
@@ -199,7 +218,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     }
     if (this.config.validate) {
       this.currentStatus = FormStatusType.validating;
-      const message = await this.config.validate(this.currentValue);
+      const message = await this.config.validate(this.currentFormValue);
       this.hasError = !!message;
       this.currentMessage = message;
     } else {
@@ -219,8 +238,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
    * 设值并校验 返回一个校验是否通过的标识 通过则为true
    * @param value 表单值
    */
-  async setValueWithValidate(value: any): Promise<boolean> {
-    this.formValue = value;
+  async setValueWithValidate(): Promise<boolean> {
+    this.currentValue = this.getFormDataValue();
     const { error } = await this.formValue;
     return !error;
   }
@@ -229,7 +248,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
    * @param value 控件值
    */
   setDebounceValue(value: any): void {
-    this.currentValue = value;
+    this.setFormData({ [this.config.key || "unknown"]: value });
+
+    this.currentValue = this.getFormDataValue();
     myDebounce.go(() => {
       this.onValidate();
     }, 300);
@@ -255,11 +276,11 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   @Emit("change")
   //eslint-disable-next-line
   protected onValueChange(_extra?: any) {
-    return this.currentValue;
+    return this.currentFormValue;
   }
   //控件本身
   get inputController(): ScopedSlotChildren | VNode[] {
-    const value = this.currentValue;
+    const value = this.currentFormValue;
     const config = this.config;
     const defaultValue = this.currentDefaultValue;
     const disabled = this.currentDisabled;

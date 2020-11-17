@@ -60,6 +60,9 @@
     <AButton @click="handleSetValues">设置值</AButton>
     <AButton @click="handleSetValuesWithValidate">设置一坨值并校验</AButton>
     <AButton @click="toogleControllers">隐藏或显示某些控件</AButton>
+    <AButton @click="reset">重置</AButton>
+    <AButton @click="setDefaultValue">改变默认值</AButton>
+    <AButton @click="clear">clear</AButton>
     <p>{{ currentValue }}</p>
   </div>
 </template>
@@ -252,6 +255,21 @@ export default class App extends Vue {
         status: FormStatusType.warning,
         message: "花里胡哨的......"
       });
+    }
+  }
+  private reset() {
+    if (this.form) {
+      this.form.resetValues();
+    }
+  }
+  private setDefaultValue() {
+    if (this.form) {
+      this.form.setDefaultValue("custom", "wocacacacaca");
+    }
+  }
+  private clear() {
+    if (this.form) {
+      this.form.clearValues();
     }
   }
   private handleSetStatus(): void {
