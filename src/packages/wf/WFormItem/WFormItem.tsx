@@ -43,8 +43,7 @@ const defaultInputStyle = (type: FormItemType): any => {
 
 @Component
 export default class WFormItem extends Vue implements wform.FormItemMethods {
-  @Prop({ type: Object, required: true })
-  readonly config!: wform.FormConfigItem;
+  [x: string]: any;
   @Prop({ type: Boolean })
   readonly disabled?: boolean;
   @Prop({ type: Function })
@@ -70,6 +69,10 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   private defaultMessage: string | VNode | null = null;
   private hidden = false;
   private currentOptions: any[] = [];
+  private config: wform.FormConfigItem = this.rootComp.getConfig(
+    this.$vnode.key
+  );
+
   private changeFunc({ target: { value } }: any) {
     this.setDebounceValue(value);
     this.onValueChange();
@@ -78,7 +81,6 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     this.setDebounceValue(value);
     this.onValueChange();
   }
-
   mounted() {
     this.delegate &&
       this.delegate({
@@ -98,6 +100,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
           hide: this.hide
         }
       });
+  }
+  beforeDestroy() {
+    this.rootComp.removeField(this.config.key);
   }
   set hasError(value: boolean) {
     this.currentHasError = value;
@@ -123,7 +128,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
    * Gets form value
    * 用getter和setter 维护表单控件的方法
    */
-  get formValue(): Promise<wform.FormItemValue<any>> {
+  formValue(): Promise<wform.FormItemValue<any>> {
     return new Promise<wform.FormItemValue<any>>(r => {
       this.onValidate().then(validate => {
         r({
@@ -232,7 +237,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   }
   //
   async getValueWithValidate(): Promise<wform.FormItemValue<any>> {
-    return this.formValue;
+    return this.formValue();
   }
   /**
    * 设值并校验 返回一个校验是否通过的标识 通过则为true
@@ -240,7 +245,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
    */
   async setValueWithValidate(): Promise<boolean> {
     this.currentValue = this.getFormDataValue();
-    const { error } = await this.formValue;
+    const { error } = await this.formValueI();
     return !error;
   }
   /**
@@ -249,6 +254,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
    */
   setDebounceValue(value: any): void {
     this.setFormData({ [this.config.key || "unknown"]: value });
+    this.currentValue = this.getFormDataValue();
 
     this.currentValue = this.getFormDataValue();
     myDebounce.go(() => {
@@ -303,6 +309,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     };
     switch (this.config.type) {
       case FormItemType.radio:
+        this.isNormalChangeFunc = true;
         currentController = this.renderOptionsController(params);
         break;
       case FormItemType.select:
@@ -318,6 +325,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
         currentController = this.getFormInput(params);
         break;
       default:
+        this.isNormalChangeFunc = true;
         currentController = this.getFormInput(params);
     }
     return [currentController];
@@ -397,6 +405,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     //准备数据
     const { status, message } = this.status;
     const config = this.config;
+    console.log("config", config);
     const inputController = this.inputController;
     return h(
       Form.Item,

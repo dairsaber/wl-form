@@ -77,6 +77,7 @@ export default class WForm extends Vue implements wform.FormController {
       this.myFormData[key] = value;
     });
   };
+  private currentConfig = this.configFunc(this);
 
   protected formMap: { [key: string]: wform.FormItemInfo } = {};
 
@@ -245,6 +246,7 @@ export default class WForm extends Vue implements wform.FormController {
   // 提交并获取表单所以字段的值 并校验
   async submit<T>(): Promise<wform.FormValue<T>> {
     const keys = Object.keys(this.formMap);
+    console.log("this.formMap", this.formMap);
     let hasError = false;
     let result = {};
     for (let i = 0; i < keys.length; i++) {
@@ -264,12 +266,14 @@ export default class WForm extends Vue implements wform.FormController {
   }
 
   getConfig(key: string): wform.FormConfigItem {
-    const currentConfig = this.configFunc(this);
-    const config: wform.FormConfigItem = currentConfig[key];
+    const config: wform.FormConfigItem = this.currentConfig[key];
     config.key = key;
     //初始值
     config.defaultValue = getFilterValue(config, this.defaultValues[key]);
     return config;
+  }
+  removeField(key: string) {
+    delete this.formMap[key];
   }
   //设置默认值 并重置 表单值为当前默认值
   setDefaultValue(key: string, value: any) {
@@ -285,6 +289,7 @@ export default class WForm extends Vue implements wform.FormController {
     });
   }
   delegate(formItemInfo: wform.FormItemInfo) {
+    console.log("formItemInfo", formItemInfo, formItemInfo.config.key);
     if (this.disabled) {
       formItemInfo.methods.setDisabled(this.disabled);
     }

@@ -4,33 +4,36 @@
     <wl-form
       :defaultValues="{ custom: '滚一边去' }"
       :configFunc="configFunc"
-      v-slot="{ delegate, getConfig }"
+      v-slot="{ delegate }"
       :createForm="createForm"
     >
-      <wl-form-item disabled :delegate="delegate" :config="getConfig('text')" />
-      <wl-form-item :delegate="delegate" :config="getConfig('textarea')" />
-      <wl-form-item :delegate="delegate" :config="getConfig('text2')" />
-      <wl-form-item :delegate="delegate" :config="getConfig('text3')" />
-      <wl-form-item :delegate="delegate" :config="getConfig('switch')" />
+      <wl-form-item disabled :delegate="delegate" key="text" />
+      <wl-form-item :delegate="delegate" key="textarea" />
+      <wl-form-item v-if="!!visible" :delegate="delegate" key="text2" />
       <wl-form-item
         :delegate="delegate"
-        :config="getConfig('select')"
-        :options="['滚蛋', '滚犊子', '去你大爷的']"
-        :renderItem="renderSelect"
+        @change="handlerTextChange"
+        key="text3"
       />
       <wl-form-item
         :delegate="delegate"
-        :config="getConfig('radio')"
+        :options="['滚蛋', '滚犊子', '去你大爷的']"
+        :renderItem="renderSelect"
+        key="select"
+      />
+      <wl-form-item
+        :delegate="delegate"
         :options="[
           { value: true, label: '是' },
           { value: false, label: '非' }
         ]"
         :renderItem="renderRadio"
+        key="radio"
       />
       <!-- 自定义写法 -->
       <wl-form-item
+        key="custom"
         :delegate="delegate"
-        :config="getConfig('custom')"
         v-slot="{ setValue, value }"
       >
         <div style="width:100%;display:flex;margin-top:4px">
@@ -139,7 +142,7 @@ function configFunc(context: Vue): wform.FormConfig {
     },
     text2: {
       type: FormItemType.text,
-      label: "text",
+      label: "text2",
       required: true,
       tip: "请输入正确的数据",
       props: {
@@ -150,8 +153,6 @@ function configFunc(context: Vue): wform.FormConfig {
     text3: {
       type: FormItemType.text,
       label: "text3",
-      required: true,
-      tip: "请输入正确的数据",
       props: {
         labelCol: { span: 3 },
         wrapperCol: { span: 20 }
@@ -216,6 +217,7 @@ export default class App extends Vue {
   private configFunc: wform.getFormConfig = configFunc;
   private form: wform.FormController | null = null;
   private currentValue: any = {};
+  private visible = "";
   private createForm(formController: wform.FormController) {
     this.form = formController;
   }
@@ -248,6 +250,9 @@ export default class App extends Vue {
     if (this.form) {
       this.currentValue = await this.form.submit();
     }
+  }
+  private async handlerTextChange(value: string) {
+    this.visible = value;
   }
   private handleClearStatus(): void {
     if (this.form) {
