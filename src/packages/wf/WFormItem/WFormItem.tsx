@@ -249,7 +249,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
    */
   async setValueWithValidate(): Promise<boolean> {
     this.currentValue = this.getFormDataValue();
-    const { error } = await this.formValueI();
+    const { error } = await this.formValue();
     return !error;
   }
   /**
