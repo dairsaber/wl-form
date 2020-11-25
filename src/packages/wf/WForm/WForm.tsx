@@ -265,11 +265,16 @@ export default class WForm extends Vue implements wform.FormController {
     return { error: hasError, values: result as T };
   }
 
-  getConfig(key: string): wform.FormConfigItem {
-    const config: wform.FormConfigItem = this.currentConfig[key];
-    config.key = key;
-    //初始值
-    config.defaultValue = getFilterValue(config, this.defaultValues[key]);
+  getConfig(key?: string): wform.FormConfigItem {
+    let config: wform.FormConfigItem;
+    if (key) {
+      config = this.currentConfig[key];
+      config.key = key;
+      //初始值
+      config.defaultValue = getFilterValue(config, this.defaultValues[key]);
+    } else {
+      config = { type: FormItemType.custom, key: "unknown" };
+    }
     return config;
   }
   removeField(key: string) {
