@@ -294,16 +294,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     const config = this.config;
     const defaultValue = this.currentDefaultValue;
     const disabled = this.currentDisabled;
-    const scopedSlotFunc = this.$scopedSlots["default"];
     const options = this.currentOptions;
-    if (scopedSlotFunc) {
-      return scopedSlotFunc({
-        setValue: this.setDebounceValue,
-        value,
-        disabled,
-        config
-      });
-    }
     let currentController: VNode;
     const params: wform.ControllerRenderParams = {
       config,
@@ -425,7 +416,16 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
           ...config.props
         }
       },
-      [inputController]
+      [
+        (this.$scopedSlots.default &&
+          this.$scopedSlots.default({
+            setValue: this.setDebounceValue,
+            value: this.currentFormValue,
+            disabled: this.currentDisabled,
+            config
+          })) ||
+          inputController
+      ]
     );
   }
 }
