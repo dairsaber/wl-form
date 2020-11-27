@@ -1,79 +1,135 @@
 <template>
   <div id="app">
-    <Test />
-    <wl-form
-      :defaultValues="{ custom: '滚一边去' }"
-      :configFunc="configFunc"
-      v-slot="{ delegate }"
-      :createForm="createForm"
-    >
-      <wl-form-item disabled :delegate="delegate" key="text" />
-      <wl-form-item :delegate="delegate" key="textarea" />
-      <wl-form-item v-if="!!visible" :delegate="delegate" key="text2" />
-      <wl-form-item
-        :delegate="delegate"
-        @change="handlerTextChange"
-        key="text3"
-      />
-      <wl-form-item
-        :delegate="delegate"
-        :options="['滚蛋', '滚犊子', '去你大爷的']"
-        :renderItem="renderSelect"
-        key="select"
-      />
-      <wl-form-item
-        :delegate="delegate"
-        :options="[
-          { value: true, label: '是' },
-          { value: false, label: '非' }
-        ]"
-        :renderItem="renderRadio"
-        key="radio"
-      />
-      <!-- 自定义写法 -->
-      <wl-form-item
-        key="custom"
-        :delegate="delegate"
-        v-slot="{ setValue, value }"
-      >
-        <div style="width:100%;display:flex;margin-top:4px">
-          <AInput
-            style="flex:1"
-            :value="value"
-            @change="
-              ({ target: { value } }) => {
-                setValue(value);
-              }
-            "
+    <a-modal :width="720" visible>
+      <a-row :gutter="32">
+        <Test />
+        <wl-form
+          :defaultValues="{ custom: '滚一边去' }"
+          :configFunc="configFunc"
+          v-slot="{ delegate }"
+          :createForm="createForm"
+        >
+          <wl-form-item disabled :delegate="delegate" key="text" />
+          <wl-form-item :delegate="delegate" key="textarea" />
+          <wl-form-item v-if="!!visible" :delegate="delegate" key="text2" />
+          <wl-form-item
+            :delegate="delegate"
+            @change="handlerTextChange"
+            key="text3"
           />
-          <a-button
-            @click="
-              () => {
-                setValue(undefined);
-              }
-            "
-            >清空</a-button
+          <wl-form-item
+            :delegate="delegate"
+            :options="['滚蛋', '滚犊子', '去你大爷的']"
+            :renderItem="renderSelect"
+            key="select"
+          />
+          <wl-form-item
+            :delegate="delegate"
+            :options="[
+              { value: true, label: '是' },
+              { value: false, label: '非' }
+            ]"
+            :renderItem="renderRadio"
+            key="radio"
+          />
+          <!-- 自定义写法 -->
+          <wl-form-item
+            key="custom"
+            :delegate="delegate"
+            v-slot="{ setValue, value }"
           >
-        </div>
-      </wl-form-item>
-    </wl-form>
-    <AButton @click="handleSetStatus">给text3设置永久状态</AButton>
-    <AButton @click="handleClearStatus">给text设置状态</AButton>
-    <AButton @click="handleSubmit">获取值</AButton>
-    <AButton @click="handleSetValues">设置值</AButton>
-    <AButton @click="handleSetValuesWithValidate">设置一坨值并校验</AButton>
-    <AButton @click="toogleControllers">隐藏或显示某些控件</AButton>
-    <AButton @click="reset">重置</AButton>
-    <AButton @click="setDefaultValue">改变默认值</AButton>
-    <AButton @click="setRequired">改变必填字段的状态</AButton>
-    <AButton @click="clear">clear</AButton>
+            <div style="width:100%;display:flex;margin-top:4px">
+              <AInput
+                style="flex:1"
+                :value="value"
+                @change="
+                  ({ target: { value } }) => {
+                    setValue(value);
+                  }
+                "
+              />
+              <a-button
+                @click="
+                  () => {
+                    setValue(undefined);
+                  }
+                "
+                >清空</a-button
+              >
+            </div>
+          </wl-form-item>
+          <a-row style="padding:0 2rem" :gutter="32">
+            <a-col :span="12">
+              <wl-form-item
+                key="inputCustom"
+                :delegate="delegate"
+                v-slot="{ setValue, value }"
+              >
+                <div style="width:100%;">
+                  <AInput
+                    style="flex:1"
+                    :value="value"
+                    @change="
+                      ({ target: { value } }) => {
+                        setValue(value + '滚犊子');
+                        testValue = value;
+                      }
+                    "
+                  />
+                  <div v-if="testValue.length > 10">{{ testValue }}</div>
+                </div>
+              </wl-form-item>
+            </a-col>
+            <a-col :span="12">
+              <wl-form-item
+                :delegate="delegate"
+                key="prepayment"
+                v-slot="{ setValue, value }"
+              >
+                <a-input
+                  :value="value"
+                  :allowClear="true"
+                  addonAfter="元"
+                  @change="
+                    ({ target: { value } }) => {
+                      let val = value.replace(/[^0-9.]/g, '');
+                      setValue(val);
+                    }
+                  "
+                />
+              </wl-form-item>
+            </a-col>
+          </a-row>
+        </wl-form>
+      </a-row>
+      <AButton @click="handleSetStatus">给text3设置永久状态</AButton>
+      <AButton @click="handleClearStatus">给text设置状态</AButton>
+      <AButton @click="handleSubmit">获取值</AButton>
+      <AButton @click="handleSetValues">设置值</AButton>
+      <AButton @click="handleSetValuesWithValidate">设置一坨值并校验</AButton>
+      <AButton @click="toogleControllers">隐藏或显示某些控件</AButton>
+      <AButton @click="reset">重置</AButton>
+      <AButton @click="setDefaultValue">改变默认值</AButton>
+      <AButton @click="setRequired">改变必填字段的状态</AButton>
+      <AButton @click="clear">clear</AButton>
+    </a-modal>
+
     <p>{{ currentValue }}</p>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Test from "./components/Test";
-import { Icon, Button, Input, Select, Radio } from "ant-design-vue";
+import {
+  Icon,
+  Button,
+  Input,
+  Select,
+  Radio,
+  Row,
+  Col,
+  Modal
+} from "ant-design-vue";
 import { VNode } from "vue";
 enum FormItemType {
   text = "text",
@@ -125,21 +181,29 @@ function configFunc(context: Vue): wform.FormConfig {
         hasFeedback: true
       }
     },
+    prepayment: {
+      type: FormItemType.custom,
+      label: "prepayment",
+      required: true,
+      placeholder: "请输入.....",
+      tip: "请输入正确的数据"
+    },
     custom: {
       type: FormItemType.custom,
       label: "custom",
       required: true,
       tip: "请输入正确的数据",
-      props: {
-        labelCol: { span: 3 },
-        wrapperCol: { span: 20 }
-      },
+
       validate: (value: any) => {
         if (value !== "滚") {
           return "该值不是'滚'";
         }
         return null;
       }
+    },
+    inputCustom: {
+      type: FormItemType.custom,
+      label: "inputCustom"
     },
     text2: {
       type: FormItemType.text,
@@ -210,7 +274,10 @@ function configFunc(context: Vue): wform.FormConfig {
   components: {
     Test,
     AButton: Button,
-    AInput: Input
+    AInput: Input,
+    ARow: Row,
+    ACol: Col,
+    AModal: Modal
   }
 })
 // eslint-disable no-undef
@@ -219,6 +286,7 @@ export default class App extends Vue {
   private form: wform.FormController | null = null;
   private currentValue: any = {};
   private visible = "";
+  private testValue = "";
   private createForm(formController: wform.FormController) {
     this.form = formController;
   }
