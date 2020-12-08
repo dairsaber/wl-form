@@ -10,7 +10,7 @@
           :createForm="createForm"
         >
           <wl-form-item disabled :delegate="delegate" key="text" />
-          <wl-form-item :delegate="delegate" key="textarea" />
+          <wl-form-item :delegate="delegate" key="textarea" :rows="5" />
           <wl-form-item v-if="!!visible" :delegate="delegate" key="text2" />
           <wl-form-item
             :delegate="delegate"
@@ -262,7 +262,11 @@ function configFunc(context: Vue): wform.FormConfig {
           "这是一段文字"
         ]);
       },
+      // childProps: {
+      //   rows: 20
+      // },
       props: {
+        // rows: 20,
         labelCol: { span: 3 },
         wrapperCol: { span: 20 },
         hasFeedback: true

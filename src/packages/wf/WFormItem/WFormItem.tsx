@@ -335,14 +335,23 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       NodeMap[config.type],
       {
         style: defaultInputStyle(config.type),
+        attrs: {
+          rows:
+            (this.$attrs || {}).rows ||
+            (config.childProps || {}).rows ||
+            (config.props || {}).rows,
+          ...config.attrs
+        },
         props: {
+          ...(config.props || {}),
+          ...(config.childProps || {}),
+          ...(this.$attrs || {}),
           disabled,
           defaultValue,
           defaultChecked: defaultValue,
           value,
           checked: value,
-          placeholder: this.config.placeholder,
-          ...this.config.childProps
+          rows: 20
         },
         on: {
           change: (event: any) => {

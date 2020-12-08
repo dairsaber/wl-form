@@ -66,12 +66,7 @@ declare global {
     };
 
     export type FormProps = {
-      hasFeedback?: boolean;
-      extra?: string | VNode;
-      htmlFor?: string;
-      labelAlign?: LabelAlign;
-      labelCol?: AntCol;
-      wrapperCol?: AntCol;
+      [key: string]: any;
     };
     export type FormConfigItem = {
       key?: string;
@@ -81,6 +76,7 @@ declare global {
       tip?: setTip | string;
       label?: string | VNode;
       props?: FormProps;
+      attrs?: FormProps;
       defaultValue?: any;
       validate?: validateFunc;
       childProps?: CommonProp;
