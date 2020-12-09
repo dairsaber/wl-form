@@ -331,40 +331,41 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     { config, value, defaultValue, disabled }: wform.ControllerRenderParams,
     children: VNode[] | ScopedSlotChildren = []
   ): VNode {
-    return this.$createElement(
-      NodeMap[config.type],
-      {
-        style: defaultInputStyle(config.type),
-        attrs: {
-          rows:
-            (this.$attrs || {}).rows ||
-            (config.childProps || {}).rows ||
-            (config.props || {}).rows,
-          ...config.attrs
-        },
-        props: {
-          ...(config.props || {}),
-          ...(config.childProps || {}),
-          ...(this.$attrs || {}),
-          disabled,
-          defaultValue,
-          defaultChecked: defaultValue,
-          value,
-          checked: value,
-          rows: 20
-        },
-        on: {
-          change: (event: any) => {
-            if (this.isNormalChangeFunc) {
-              this.changeFunc(event);
-            } else {
-              this.otherChangeFunc(event);
-            }
+    // eslint-disable-next-line
+    const { hasFeedback, labelCol, wrapperCol, ...other } = (config.props ||
+      {}) as any;
+    const nodeConfig = {
+      style: defaultInputStyle(config.type),
+      attrs: {
+        rows:
+          (this.$attrs || {}).rows ||
+          (config.childProps || {}).rows ||
+          other.rows,
+        ...config.attrs
+      },
+      props: {
+        placeholder: config.placeholder,
+        ...other,
+        ...(config.childProps || {}),
+        ...(this.$attrs || {}),
+        disabled,
+        defaultValue,
+        defaultChecked: defaultValue,
+        value,
+        checked: value,
+        rows: 20
+      },
+      on: {
+        change: (event: any) => {
+          if (this.isNormalChangeFunc) {
+            this.changeFunc(event);
+          } else {
+            this.otherChangeFunc(event);
           }
         }
-      },
-      children
-    );
+      }
+    };
+    return this.$createElement(NodeMap[config.type], nodeConfig, children);
   }
   //渲染带有option的控件
   renderOptionsController({
