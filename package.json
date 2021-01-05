@@ -14,9 +14,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "serve": "yarn lint_fix & vue-cli-service serve",
-    "build": "yarn lint_fix &  vue-cli-service build --target lib --name wlForm src/packages/install.ts",
-    "lint_fix": "npx eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build --target lib --name wlForm src/packages/install.ts",
     "build-prod": "webpack --config build/webpack.prod.js --progress --hide-modules "
   },
   "dependencies": {
