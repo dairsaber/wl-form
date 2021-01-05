@@ -5,9 +5,9 @@ import {
   Watch,
   Emit,
   Inject
-} from "vue-property-decorator";
-import { CreateElement } from "vue";
-import { VNode } from "vue";
+} from "vue-property-decorator"
+import { CreateElement } from "vue"
+import { VNode } from "vue"
 import {
   Form,
   Input,
@@ -17,12 +17,12 @@ import {
   DatePicker,
   Radio,
   Checkbox
-} from "ant-design-vue";
-import { ScopedSlotChildren } from "vue/types/vnode";
-import { Debounce } from "aftool";
-import { FormItemType, FormStatusType } from "../types/wf-types";
+} from "ant-design-vue"
+import { ScopedSlotChildren } from "vue/types/vnode"
+import { Debounce } from "aftool"
+import { FormItemType, FormStatusType } from "../types/wf-types"
 
-const myDebounce = new Debounce();
+const myDebounce = new Debounce()
 const NodeMap: { [key: string]: any } = {
   [FormItemType.text]: Input,
   [FormItemType.textarea]: Input.TextArea,
@@ -34,52 +34,52 @@ const NodeMap: { [key: string]: any } = {
   [FormItemType.month]: DatePicker.MonthPicker,
   [FormItemType.radio]: Radio.Group,
   [FormItemType.checkbox]: Checkbox
-};
+}
 const defaultInputStyle = (type: FormItemType): any => {
-  const noStyleTypes = [FormItemType.checkbox, FormItemType.switch];
-  if (noStyleTypes.includes(type)) return {};
-  return { width: "100%" };
-};
+  const noStyleTypes = [FormItemType.checkbox, FormItemType.switch]
+  if (noStyleTypes.includes(type)) return {}
+  return { width: "100%" }
+}
 
 @Component
 export default class WFormItem extends Vue implements wform.FormItemMethods {
-  [x: string]: any;
+  [x: string]: any
   @Prop({ type: Boolean })
-  readonly disabled?: boolean;
+  readonly disabled?: boolean
   @Prop({ type: Function })
-  readonly delegate?: wform.formDelegate;
+  readonly delegate?: wform.formDelegate
   @Prop()
-  readonly options?: any;
+  readonly options?: any
   @Prop({ type: Function })
-  readonly renderItem?: wform.RenderItemFunc;
-  @Inject("rootComp") private rootComp!: any;
+  readonly renderItem?: wform.RenderItemFunc
+  @Inject("rootComp") private rootComp!: any
   @Inject("setFormData") private setFormData!: (obj?: {
-    [key: string]: any;
-  }) => void;
+    [key: string]: any
+  }) => void
   //这边属性如果不付值的话将不会被注入vue的data中 大坑 而且不能赋值为undefined
-  private currentDefaultValue: any = null;
-  private currentControlValue: any = null;
-  private isShowStatus = true;
-  private currentHasError = false;
-  private currentMessage: string | VNode | null = null;
-  private currentDisabled = false;
-  private currentStatus: wform.FormStatusType | null = null;
-  private isNormalChangeFunc = true;
-  private defaultStatus: FormStatusType | null = null;
-  private defaultMessage: string | VNode | null = null;
-  private hidden = false;
-  private currentOptions: any[] = [];
+  private currentDefaultValue: any = null
+  private currentControlValue: any = null
+  private isShowStatus = true
+  private currentHasError = false
+  private currentMessage: string | VNode | null = null
+  private currentDisabled = false
+  private currentStatus: wform.FormStatusType | null = null
+  private isNormalChangeFunc = true
+  private defaultStatus: FormStatusType | null = null
+  private defaultMessage: string | VNode | null = null
+  private hidden = false
+  private currentOptions: any[] = []
   private config: wform.FormConfigItem = this.rootComp.getConfig(
     this.$vnode.key
-  );
+  )
 
   private changeFunc({ target: { value } }: any) {
-    this.setDebounceValue(value);
-    this.onValueChange();
+    this.setDebounceValue(value)
+    this.onValueChange()
   }
   private otherChangeFunc(value: any) {
-    this.setDebounceValue(value);
-    this.onValueChange();
+    this.setDebounceValue(value)
+    this.onValueChange()
   }
   mounted() {
     this.delegate &&
@@ -100,30 +100,29 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
           setOptions: this.setOptions,
           hide: this.hide
         }
-      });
+      })
   }
   beforeDestroy() {
-    this.rootComp.removeField(this.config.key);
+    this.rootComp.removeField(this.config.key)
   }
   set hasError(value: boolean) {
-    this.currentHasError = value;
+    this.currentHasError = value
     if (value) {
-      this.currentStatus = FormStatusType.error;
+      this.currentStatus = FormStatusType.error
     } else {
-      this.currentStatus = this.defaultStatus || FormStatusType.success;
-      this.currentMessage = this.defaultMessage;
+      this.currentStatus = this.defaultStatus || FormStatusType.success
+      this.currentMessage = this.defaultMessage
     }
   }
   get hasError(): boolean {
-    return this.currentHasError;
+    return this.currentHasError
   }
   get currentValue(): any {
-    return this.currentControlValue;
+    return this.currentControlValue
   }
   //拦截所有赋值操作
   set currentValue(value: any) {
-    if (this.currentDisabled) return;
-    this.currentControlValue = value;
+    this.currentControlValue = value
   }
   /**
    * Gets form value
@@ -135,196 +134,196 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
         r({
           error: !validate,
           value: this.currentFormValue
-        });
-      });
-    });
+        })
+      })
+    })
   }
   // 当前控件的状态
   get status(): wform.StatusMessage {
     const currentStatus = this.isShowStatus
       ? this.currentStatus
-      : this.defaultStatus;
+      : this.defaultStatus
     return {
       status: currentStatus,
       message: this.isShowStatus ? this.currentMessage : this.defaultMessage
-    };
+    }
   }
   get currentFormValue(): any {
-    const value = this.currentValue || this.getFormDataValue();
-    return value;
+    const value = this.currentValue || this.getFormDataValue()
+    return value
   }
   setRequired(isRequired: boolean) {
-    this.config = { ...this.config, required: isRequired };
+    this.config = { ...this.config, required: isRequired }
   }
   getFormDataValue() {
-    return this.rootComp.myFormData[this.config.key + ""];
+    return this.rootComp.myFormData[this.config.key + ""]
   }
   getDefaultFormDataValue() {
-    return this.rootComp.myDefaultFormData[this.config.key + ""];
+    return this.rootComp.myDefaultFormData[this.config.key + ""]
   }
   //设值
   setValue() {
-    this.currentValue = this.getFormDataValue();
+    this.currentValue = this.getFormDataValue()
   }
   //获取值
   getValue(): any {
-    return this.currentFormValue;
+    return this.currentFormValue
   }
   //设置默认值 这个会影响重置的时候表单控件值
   setDefaultValue() {
-    this.currentDefaultValue = this.getDefaultFormDataValue();
-    this.resetValue();
+    this.currentDefaultValue = this.getDefaultFormDataValue()
+    this.resetValue()
   }
   //获取默认值
   getDefaultValue(): any {
-    return this.getDefaultFormDataValue();
+    return this.getDefaultFormDataValue()
   }
   // 重置控件值
   resetValue(): any {
-    this.clearStatus();
-    this.currentValue = this.getDefaultFormDataValue();
-    return this.currentDefaultValue;
+    this.clearStatus()
+    this.currentValue = this.getDefaultFormDataValue()
+    return this.currentDefaultValue
   }
   // 清除 表单校验状态 但是不重置 error状态 只是重置显示效果
   clearStatus(): void {
-    this.isShowStatus = false;
+    this.isShowStatus = false
   }
   /**
    * 校验
    * 会返回一个 校验状态 通过则 true 否则 false
    */
   async onValidate(): Promise<boolean> {
-    this.isShowStatus = true;
-    let isOk = true;
+    this.isShowStatus = true
+    let isOk = true
     if (this.config.required) {
       switch (true) {
         case typeof this.currentFormValue === "number":
         case typeof this.currentFormValue === "boolean":
-          break;
+          break
         case typeof this.currentFormValue === "string":
-          isOk = !!this.currentFormValue.trim();
-          break;
+          isOk = !!this.currentFormValue.trim()
+          break
         case Array.isArray(this.currentFormValue):
-          isOk = !!this.currentFormValue.length;
-          break;
+          isOk = !!this.currentFormValue.length
+          break
         case typeof this.currentFormValue === "object":
           isOk =
             !!this.currentFormValue &&
-            !!Object.keys(this.currentFormValue).length;
-          break;
+            !!Object.keys(this.currentFormValue).length
+          break
         default:
-          isOk = !!this.currentFormValue;
+          isOk = !!this.currentFormValue
       }
     }
     if (!isOk) {
       if (typeof this.config.tip === "function") {
-        this.currentMessage = this.config.tip(this.config);
+        this.currentMessage = this.config.tip(this.config)
       } else {
-        this.currentMessage = this.config.tip || "";
+        this.currentMessage = this.config.tip || ""
       }
-      this.hasError = true;
-      return !this.hasError;
+      this.hasError = true
+      return !this.hasError
     }
     if (this.config.validate) {
-      this.currentStatus = FormStatusType.validating;
-      const message = await this.config.validate(this.currentFormValue);
-      this.hasError = !!message;
-      this.currentMessage = message;
+      this.currentStatus = FormStatusType.validating
+      const message = await this.config.validate(this.currentFormValue)
+      this.hasError = !!message
+      this.currentMessage = message
     } else {
-      this.hasError = false;
+      this.hasError = false
     }
-    return !this.hasError;
+    return !this.hasError
   }
   // 设置控制控件disabled状态 一旦控件处于disable的状态则无法再次对其赋值
   setDisabled(disabled: boolean): void {
-    this.currentDisabled = disabled;
+    this.currentDisabled = disabled
   }
   //
   async getValueWithValidate(): Promise<wform.FormItemValue<any>> {
-    return this.formValue();
+    return this.formValue()
   }
   /**
    * 设值并校验 返回一个校验是否通过的标识 通过则为true
    * @param value 表单值
    */
   async setValueWithValidate(): Promise<boolean> {
-    this.currentValue = this.getFormDataValue();
-    const { error } = await this.formValue();
-    return !error;
+    this.currentValue = this.getFormDataValue()
+    const { error } = await this.formValue()
+    return !error
   }
   /**
    * 设置控件值 并延迟校验 保证及时验证的不必要性
    * @param value 控件值
    */
   setDebounceValue(value: any): void {
-    this.setFormData({ [this.config.key || "unknown"]: value });
-    this.currentValue = this.getFormDataValue();
+    this.setFormData({ [this.config.key || "unknown"]: value })
+    this.currentValue = this.getFormDataValue()
 
-    this.currentValue = this.getFormDataValue();
+    this.currentValue = this.getFormDataValue()
     myDebounce.go(() => {
-      this.onValidate();
-    }, 300);
+      this.onValidate()
+    }, 300)
   }
   setStatusMessage(obj: wform.StatusMessage, permanent?: boolean) {
-    this.isShowStatus = true;
-    this.currentMessage = obj.message;
-    this.currentStatus = obj.status;
+    this.isShowStatus = true
+    this.currentMessage = obj.message
+    this.currentStatus = obj.status
     if (permanent) {
-      this.defaultStatus = obj.status;
-      this.defaultMessage = obj.message;
+      this.defaultStatus = obj.status
+      this.defaultMessage = obj.message
     }
   }
   setOptions(value: any[]) {
-    this.currentOptions = value;
+    this.currentOptions = value
   }
   //隐藏
   hide(val = true) {
-    this.hidden = val;
+    this.hidden = val
   }
   // 发射change事件
   @Emit("input")
   @Emit("change")
   //eslint-disable-next-line
   protected onValueChange(_extra?: any) {
-    return this.currentFormValue;
+    return this.currentFormValue
   }
   //控件本身
   get inputController(): ScopedSlotChildren | VNode[] {
-    const value = this.currentFormValue;
-    const config = this.config;
-    const defaultValue = this.currentDefaultValue;
-    const disabled = this.currentDisabled;
-    const options = this.currentOptions;
-    let currentController: VNode;
+    const value = this.currentFormValue
+    const config = this.config
+    const defaultValue = this.currentDefaultValue
+    const disabled = this.currentDisabled
+    const options = this.currentOptions
+    let currentController: VNode
     const params: wform.ControllerRenderParams = {
       config,
       value,
       defaultValue,
       disabled,
       options
-    };
+    }
     switch (this.config.type) {
       case FormItemType.radio:
-        this.isNormalChangeFunc = true;
-        currentController = this.renderOptionsController(params);
-        break;
+        this.isNormalChangeFunc = true
+        currentController = this.renderOptionsController(params)
+        break
       case FormItemType.select:
-        currentController = this.renderOptionsController(params);
-        this.isNormalChangeFunc = false;
-        break;
+        currentController = this.renderOptionsController(params)
+        this.isNormalChangeFunc = false
+        break
       case FormItemType.week:
       case FormItemType.date:
       case FormItemType.month:
       case FormItemType.number:
       case FormItemType.switch:
-        this.isNormalChangeFunc = false;
-        currentController = this.getFormInput(params);
-        break;
+        this.isNormalChangeFunc = false
+        currentController = this.getFormInput(params)
+        break
       default:
-        this.isNormalChangeFunc = true;
-        currentController = this.getFormInput(params);
+        this.isNormalChangeFunc = true
+        currentController = this.getFormInput(params)
     }
-    return [currentController];
+    return [currentController]
   }
   // 获取基本空间
   getFormInput(
@@ -333,7 +332,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   ): VNode {
     // eslint-disable-next-line
     const { hasFeedback, labelCol, wrapperCol, ...other } = (config.props ||
-      {}) as any;
+      {}) as any
     const nodeConfig = {
       style: defaultInputStyle(config.type),
       attrs: {
@@ -358,14 +357,14 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       on: {
         change: (event: any) => {
           if (this.isNormalChangeFunc) {
-            this.changeFunc(event);
+            this.changeFunc(event)
           } else {
-            this.otherChangeFunc(event);
+            this.otherChangeFunc(event)
           }
         }
       }
-    };
-    return this.$createElement(NodeMap[config.type], nodeConfig, children);
+    }
+    return this.$createElement(NodeMap[config.type], nodeConfig, children)
   }
   //渲染带有option的控件
   renderOptionsController({
@@ -375,43 +374,43 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     disabled,
     options = []
   }: wform.ControllerRenderParams): VNode {
-    let optionVNodes: any[] = [];
+    let optionVNodes: any[] = []
     if (this.renderItem) {
       optionVNodes = options.map(optionItem => {
-        if (this.renderItem) return this.renderItem(optionItem);
-      });
+        if (this.renderItem) return this.renderItem(optionItem)
+      })
     }
     return this.getFormInput(
       { config, value, defaultValue, disabled },
       optionVNodes
-    );
+    )
   }
   @Watch("disabled", { immediate: true })
   disabledWatch(val = false) {
-    this.currentDisabled = val;
+    this.currentDisabled = val
   }
   @Watch("options", { immediate: true })
   optionsWatch(val?: any[]) {
     if (val) {
-      this.currentOptions = val;
+      this.currentOptions = val
     }
   }
   @Watch("config.defaultValue", { immediate: true })
   watchDefaultValues(val: wform.FormConfigItem) {
-    this.currentDefaultValue = val;
-    this.currentControlValue = val;
+    this.currentDefaultValue = val
+    this.currentControlValue = val
   }
   @Watch("config.hidden", { immediate: true })
   watchHidden(val = false) {
-    this.hidden = val;
+    this.hidden = val
   }
 
   protected render(h: CreateElement): VNode | null {
-    if (this.hidden) return null;
+    if (this.hidden) return null
     //准备数据
-    const { status, message } = this.status;
-    const config = this.config;
-    const inputController = this.inputController;
+    const { status, message } = this.status
+    const config = this.config
+    const inputController = this.inputController
     return h(
       Form.Item,
       {
@@ -436,6 +435,6 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
           })) ||
           inputController
       ]
-    );
+    )
   }
 }
