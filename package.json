@@ -14,18 +14,19 @@
   ],
   "license": "MIT",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name wlForm src/packages/install.ts",
+    "serve": "yarn lint_fix & vue-cli-service serve",
+    "build": "yarn lint_fix &  vue-cli-service build --target lib --name wlForm src/packages/install.ts",
+    "lint_fix": "npx eslint 'src/**/*.{ts,tsx,js,jsx}' --fix",
     "build-prod": "webpack --config build/webpack.prod.js --progress --hide-modules "
   },
   "dependencies": {
-    "aftool": "^1.3.0",
+    "aftool": "^2.0.0",
     "ant-design-vue": "^1.5.3",
-    "core-js": "^3.6.4",
-    "moment": "^2.24.0",
+    "core-js": "^3.8.2",
+    "moment": "^2.29.1",
     "vue": "^2.6.11",
-    "vue-class-component": "^7.2.3",
-    "vue-property-decorator": "^8.4.1"
+    "vue-class-component": "^7.2.6",
+    "vue-property-decorator": "^9.1.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.26.0",

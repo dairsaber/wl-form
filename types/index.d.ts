@@ -1,10 +1,8 @@
 import { VueConstructor } from "vue/types/vue";
 import { VNode } from "vue";
 import { ColSpanType } from "ant-design-vue/types/grid/col";
-import {
-  FormItemType as formItemType,
-  FormStatusType as formStatusType
-} from "./wf-types";
+import { FormItemType as formItemType, FormStatusType as formStatusType } from "./wf-types";
+
 declare global {
   namespace common {
     export type Components = { [key: string]: VueConstructor };

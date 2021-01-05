@@ -12,11 +12,7 @@
           <wl-form-item disabled :delegate="delegate" key="text" />
           <wl-form-item :delegate="delegate" key="textarea" :rows="5" />
           <wl-form-item v-if="!!visible" :delegate="delegate" key="text2" />
-          <wl-form-item
-            :delegate="delegate"
-            @change="handlerTextChange"
-            key="text3"
-          />
+          <wl-form-item :delegate="delegate" @change="handlerTextChange" key="text3" />
           <wl-form-item
             :delegate="delegate"
             :options="['滚蛋', '滚犊子', '去你大爷的']"
@@ -33,11 +29,7 @@
             key="radio"
           />
           <!-- 自定义写法 -->
-          <wl-form-item
-            key="custom"
-            :delegate="delegate"
-            v-slot="{ setValue, value }"
-          >
+          <wl-form-item key="custom" :delegate="delegate" v-slot="{ setValue, value }">
             <div style="width:100%;display:flex;margin-top:4px">
               <AInput
                 style="flex:1"
@@ -60,11 +52,7 @@
           </wl-form-item>
           <a-row style="padding:0 2rem" :gutter="32">
             <a-col :span="12">
-              <wl-form-item
-                key="inputCustom"
-                :delegate="delegate"
-                v-slot="{ setValue, value }"
-              >
+              <wl-form-item key="inputCustom" :delegate="delegate" v-slot="{ setValue, value }">
                 <div style="width:100%;">
                   <AInput
                     style="flex:1"
@@ -81,11 +69,7 @@
               </wl-form-item>
             </a-col>
             <a-col :span="12">
-              <wl-form-item
-                :delegate="delegate"
-                key="prepayment"
-                v-slot="{ setValue, value }"
-              >
+              <wl-form-item :delegate="delegate" key="prepayment" v-slot="{ setValue, value }">
                 <a-input
                   :value="value"
                   :allowClear="true"
@@ -120,16 +104,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Test from "./components/Test";
-import {
-  Icon,
-  Button,
-  Input,
-  Select,
-  Radio,
-  Row,
-  Col,
-  Modal
-} from "ant-design-vue";
+import { Icon, Button, Input, Select, Radio, Row, Col, Modal } from "ant-design-vue";
 import { VNode } from "vue";
 enum FormItemType {
   text = "text",
@@ -257,10 +232,7 @@ function configFunc(context: Vue): wform.FormConfig {
       placeholder: "请输入.....",
       required: true,
       tip: (): VNode => {
-        return h("span", {}, [
-          h(Icon, { props: { type: "smile" } }),
-          "这是一段文字"
-        ]);
+        return h("span", {}, [h(Icon, { props: { type: "smile" } }), "这是一段文字"]);
       },
       // childProps: {
       //   rows: 20

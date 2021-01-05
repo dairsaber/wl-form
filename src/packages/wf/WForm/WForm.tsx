@@ -11,15 +11,8 @@ import { FormItemType } from "../types/wf-types";
 function isNullOrUndefined(val: any) {
   return val === null || val === undefined;
 }
-const DATE_TYPES: wform.FormItemType[] = [
-  FormItemType.month,
-  FormItemType.date,
-  FormItemType.week
-];
-function getFilterValue<T = any>(
-  config: wform.FormConfigItem,
-  value: T
-): T | Moment {
+const DATE_TYPES: wform.FormItemType[] = [FormItemType.month, FormItemType.date, FormItemType.week];
+function getFilterValue<T = any>(config: wform.FormConfigItem, value: T): T | Moment {
   const { filterFunc, type } = config;
   if (filterFunc) {
     return filterFunc<T>(value);
@@ -65,9 +58,7 @@ export default class WForm extends Vue implements wform.FormController {
     ...(this.defaultValues || {})
   };
   @Provide() private rootComp: any = this;
-  @Provide() private setDefaultFormData = (
-    obj: { [key: string]: any } = {}
-  ) => {
+  @Provide() private setDefaultFormData = (obj: { [key: string]: any } = {}) => {
     Object.entries(obj).forEach(([key, value]) => {
       this.myDefaultFormData[key] = value;
     });
@@ -141,10 +132,7 @@ export default class WForm extends Vue implements wform.FormController {
   getValue(key: string): any {
     const currentFormItem = this.formMap[key];
     return currentFormItem
-      ? getFormatValue(
-          currentFormItem.config,
-          currentFormItem.methods.getValue()
-        )
+      ? getFormatValue(currentFormItem.config, currentFormItem.methods.getValue())
       : undefined;
   }
   //设置值

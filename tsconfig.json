@@ -7,11 +7,12 @@
     "importHelpers": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": ["webpack-env"],
+    "typeRoots": ["./types", "./node_modules/vue/types", "./node_modules/@types"],
     "paths": {
       "@/*": ["src/*"]
     },
@@ -24,7 +25,9 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "shims-tsx.d.ts",
+    "vue.d.ts"
   ],
   "exclude": ["node_modules"]
 }
