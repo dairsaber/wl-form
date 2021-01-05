@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const merge = require("webpack-merge");
 const HappyPack = require("happypack");
 const { config: baseWebpackConfig, happyThreadPool } = require("./webpack.base");
