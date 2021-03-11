@@ -12,43 +12,52 @@ import {
   Checkbox
 } from "ant-design-vue";
 import { ScopedSlotChildren } from "vue/types/vnode";
-import { ActionController } from "aftool";
-import { FormItemType, FormStatusType } from "../types/wf-types";
-
-const NodeMap: { [key: string]: any } = {
-  [FormItemType.text]: Input,
-  [FormItemType.textarea]: Input.TextArea,
-  [FormItemType.number]: InputNumber,
-  [FormItemType.select]: Select,
-  [FormItemType.switch]: Switch,
-  [FormItemType.date]: DatePicker,
-  [FormItemType.week]: DatePicker.WeekPicker,
-  [FormItemType.month]: DatePicker.MonthPicker,
-  [FormItemType.radio]: Radio.Group,
-  [FormItemType.checkbox]: Checkbox
+import { debounce } from "@/packages/utils";
+import {
+  FormItemType,
+  FormItemMethods,
+  formDelegate,
+  RenderItemFunc,
+  FormStatusType,
+  FormConfigItem,
+  FormItemValue,
+  StatusMessage,
+  ControllerRenderParams,
+  Record
+} from "@/packages/types";
+const NodeMap: Record<any> = {
+  text: Input,
+  textarea: Input.TextArea,
+  number: InputNumber,
+  select: Select,
+  switch: Switch,
+  date: DatePicker,
+  week: DatePicker.WeekPicker,
+  month: DatePicker.MonthPicker,
+  radio: Radio.Group,
+  checkbox: Checkbox
 };
 const defaultInputStyle = (type: FormItemType): any => {
-  const noStyleTypes = [FormItemType.checkbox, FormItemType.switch];
+  const noStyleTypes = ["checkbox", "switch"];
   if (noStyleTypes.includes(type)) return {};
   return { width: "100%" };
 };
 
 @Component
-export default class WFormItem extends Vue implements wform.FormItemMethods {
+export default class WFormItem extends Vue implements FormItemMethods {
   [x: string]: any;
   @Prop({ type: Boolean })
   readonly disabled?: boolean;
   @Prop({ type: Function })
-  readonly delegate?: wform.formDelegate;
+  readonly delegate?: formDelegate;
   @Prop()
   readonly options?: any;
   @Prop({ type: Function })
-  readonly renderItem?: wform.RenderItemFunc;
+  readonly renderItem?: RenderItemFunc;
   @Inject("rootComp") private rootComp!: any;
   @Inject("setFormData") private setFormData!: (obj?: { [key: string]: any }) => void;
-  private validateDebounce = new ActionController({
-    debounceAction: this.onValidate
-  });
+
+  private validateDebounce = debounce(this.onValidate);
   //这边属性如果不付值的话将不会被注入vue的data中 大坑 而且不能赋值为undefined
   private currentDefaultValue: any = null;
   private currentControlValue: any = null;
@@ -56,13 +65,13 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   private currentHasError = false;
   private currentMessage: string | VNode | null = null;
   private currentDisabled = false;
-  private currentStatus: wform.FormStatusType | null = null;
+  private currentStatus: FormStatusType | null = null;
   private isNormalChangeFunc = true;
   private defaultStatus: FormStatusType | null = null;
   private defaultMessage: string | VNode | null = null;
   private hidden = false;
   private currentOptions: any[] = [];
-  private config: wform.FormConfigItem = this.rootComp.getConfig(this.$vnode.key);
+  private config: FormConfigItem = this.rootComp.getConfig(this.$vnode.key);
 
   private changeFunc({ target: { value } }: any) {
     this.setDebounceValue(value);
@@ -99,9 +108,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   set hasError(value: boolean) {
     this.currentHasError = value;
     if (value) {
-      this.currentStatus = FormStatusType.error;
+      this.currentStatus = "error";
     } else {
-      this.currentStatus = this.defaultStatus || FormStatusType.success;
+      this.currentStatus = this.defaultStatus || "success";
       this.currentMessage = this.defaultMessage;
     }
   }
@@ -119,8 +128,8 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
    * Gets form value
    * 用getter和setter 维护表单控件的方法
    */
-  formValue(): Promise<wform.FormItemValue<any>> {
-    return new Promise<wform.FormItemValue<any>>(r => {
+  formValue(): Promise<FormItemValue<any>> {
+    return new Promise<FormItemValue<any>>(r => {
       this.onValidate().then(validate => {
         r({
           error: !validate,
@@ -130,7 +139,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     });
   }
   // 当前控件的状态
-  get status(): wform.StatusMessage {
+  get status(): StatusMessage {
     const currentStatus = this.isShowStatus ? this.currentStatus : this.defaultStatus;
     return {
       status: currentStatus,
@@ -212,7 +221,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       return !this.hasError;
     }
     if (this.config.validate) {
-      this.currentStatus = FormStatusType.validating;
+      this.currentStatus = "validating";
       const message = await this.config.validate(this.currentFormValue);
       this.hasError = !!message;
       this.currentMessage = message;
@@ -226,7 +235,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     this.currentDisabled = disabled;
   }
   //
-  async getValueWithValidate(): Promise<wform.FormItemValue<any>> {
+  async getValueWithValidate(): Promise<FormItemValue<any>> {
     return this.formValue();
   }
   /**
@@ -245,9 +254,9 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   setDebounceValue(value: any): void {
     this.setFormData({ [this.config.key || "unknown"]: value });
     this.currentValue = this.getFormDataValue();
-    this.validateDebounce.debounce();
+    this.validateDebounce();
   }
-  setStatusMessage(obj: wform.StatusMessage, permanent?: boolean) {
+  setStatusMessage(obj: StatusMessage, permanent?: boolean) {
     this.isShowStatus = true;
     this.currentMessage = obj.message;
     this.currentStatus = obj.status;
@@ -278,7 +287,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     const disabled = this.currentDisabled;
     const options = this.currentOptions;
     let currentController: VNode;
-    const params: wform.ControllerRenderParams = {
+    const params: ControllerRenderParams = {
       config,
       value,
       defaultValue,
@@ -286,19 +295,19 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
       options
     };
     switch (this.config.type) {
-      case FormItemType.radio:
+      case "radio":
         this.isNormalChangeFunc = true;
         currentController = this.renderOptionsController(params);
         break;
-      case FormItemType.select:
+      case "select":
         currentController = this.renderOptionsController(params);
         this.isNormalChangeFunc = false;
         break;
-      case FormItemType.week:
-      case FormItemType.date:
-      case FormItemType.month:
-      case FormItemType.number:
-      case FormItemType.switch:
+      case "week":
+      case "date":
+      case "month":
+      case "number":
+      case "switch":
         this.isNormalChangeFunc = false;
         currentController = this.getFormInput(params);
         break;
@@ -310,7 +319,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
   }
   // 获取基本空间
   getFormInput(
-    { config, value, defaultValue, disabled }: wform.ControllerRenderParams,
+    { config, value, defaultValue, disabled }: ControllerRenderParams,
     children: VNode[] | ScopedSlotChildren = []
   ): VNode {
     // eslint-disable-next-line
@@ -352,7 +361,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     defaultValue,
     disabled,
     options = []
-  }: wform.ControllerRenderParams): VNode {
+  }: ControllerRenderParams): VNode {
     let optionVNodes: any[] = [];
     if (this.renderItem) {
       optionVNodes = options.map(optionItem => {
@@ -372,7 +381,7 @@ export default class WFormItem extends Vue implements wform.FormItemMethods {
     }
   }
   @Watch("config.defaultValue", { immediate: true })
-  watchDefaultValues(val: wform.FormConfigItem) {
+  watchDefaultValues(val: FormConfigItem) {
     this.currentDefaultValue = val;
     this.currentControlValue = val;
   }

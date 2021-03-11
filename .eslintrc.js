@@ -3,8 +3,7 @@ module.exports = {
   env: {
     node: true
   },
-  extends: ["eslint:recommended", "plugin:vue/base"],
-  plugins: ["vue"],
+  extends: ["plugin:vue/essential", "eslint:recommended", "@vue/typescript/recommended"],
   parserOptions: {
     ecmaVersion: 2020
   },

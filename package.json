@@ -1,13 +1,11 @@
 {
   "name": "wl-form",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "private": false,
   "main": "dist/wlForm.umd.min.js",
   "typings": "types/index.d.ts",
   "files": [
-    "dist/wlForm.umd.min.js",
-    "dist/wlForm.css",
-    "types/*",
+    "dist",
     "package.json",
     "README.md",
     "readme"
@@ -16,39 +14,41 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name wlForm src/packages/install.ts",
-    "build-prod": "webpack --config build/webpack.prod.js --progress --hide-modules "
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "aftool": "^2.0.0",
-    "ant-design-vue": "^1.5.3",
-    "core-js": "^3.8.2",
+    "ant-design-vue": "1.5.3",
+    "core-js": "^3.6.5",
     "moment": "^2.29.1",
     "vue": "^2.6.11",
-    "vue-class-component": "^7.2.6",
+    "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.26.0",
-    "@typescript-eslint/parser": "^2.26.0",
-    "@vue/cli-plugin-babel": "~4.3.0",
-    "@vue/cli-plugin-eslint": "~4.3.0",
-    "@vue/cli-plugin-typescript": "~4.3.0",
-    "@vue/cli-service": "~4.3.0",
-    "@vue/eslint-config-prettier": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
     "@vue/eslint-config-typescript": "^5.0.2",
-    "babel-plugin-import": "^1.13.0",
+    "babel-polyfill": "^6.26.0",
     "eslint": "^6.7.2",
-    "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^6.2.2",
-    "fibers": "^4.0.2",
-    "friendly-errors-webpack-plugin": "^1.7.0",
-    "happypack": "^5.0.1",
-    "less": "^3.0.4",
-    "less-loader": "^5.0.0",
-    "prettier": "^1.19.1",
-    "typescript": "~3.8.3",
-    "vue-template-compiler": "^2.6.11",
-    "webpack-cli": "^3.3.11"
+    "less": "^4.1.1",
+    "less-loader": "^8.0.0",
+    "lint-staged": "^9.5.0",
+    "typescript": "~3.9.3",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,vue,ts,tsx}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
   },
   "_id": "wl-form",
   "readme": "表单 for vue"

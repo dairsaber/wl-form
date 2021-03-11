@@ -5,37 +5,61 @@
 // }
 const currentEnv = process.env.NODE_ENV;
 console.log("currentEnv===>", currentEnv);
+const commonConfig = {
+  transpileDependencies: ["ant-design-vue"]
+};
 let config = {
-  pages: {
-    index: {
-      entry: "src/examples/main.ts",
-      template: "public/index.html",
-      filename: "index.html",
-      chunks: ["chunk-vendors", "chunk-common", "index"]
+  parallel: false,
+  configureWebpack: {
+    output: {
+      libraryExport: "default",
+      libraryTarget: "umd"
+    },
+    externals: {
+      vue: {
+        commonjs: "vue",
+        commonjs2: "vue",
+        amd: "vue",
+        root: "Vue"
+      },
+      "ant-design-vue": "ant-design-vue",
+      moment: "moment"
     }
+  },
+  chainWebpack: config => {
+    config.module
+      .rule("ts")
+      .use("ts-loader")
+      .loader("ts-loader")
+      .tap(options => {
+        options.happyPackMode = false;
+        options.transpileOnly = false;
+        return options;
+      });
+    config.module
+      .rule("tsx")
+      .use("ts-loader")
+      .loader("ts-loader")
+      .tap(options => {
+        options.happyPackMode = false;
+        options.transpileOnly = false;
+        return options;
+      });
   }
 };
-if (currentEnv === "production") {
+if (currentEnv === "development") {
   config = {
-    configureWebpack: {
-      output: {
-        libraryExport: "default",
-        libraryTarget: "umd"
-      },
-      externals: {
-        vue: {
-          commonjs: "vue",
-          commonjs2: "vue",
-          amd: "vue",
-          root: "Vue"
-        },
-        "ant-design-vue": "ant-design-vue",
-        aftool: "aftool",
-        moment: "moment"
+    pages: {
+      index: {
+        entry: "src/examples/main.ts",
+        template: "public/index.html",
+        filename: "index.html",
+        chunks: ["chunk-vendors", "chunk-common", "index"]
       }
     }
   };
 }
 module.exports = {
+  ...commonConfig,
   ...config
 };

@@ -1,0 +1,5 @@
+dist
+types
+*.js
+vue.config.js
+babel.config.js

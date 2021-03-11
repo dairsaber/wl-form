@@ -3,16 +3,26 @@ import moment, { Moment } from "moment";
 import { VNode } from "vue";
 import { Spin, Empty } from "ant-design-vue";
 import { CreateElement } from "vue/types/umd";
-import { FormItemType } from "../types/wf-types";
+import {
+  FormItemType,
+  FormConfigItem,
+  FormController,
+  getFormConfig,
+  FormItemInfo,
+  Record,
+  FormItemValue,
+  StatusMessage,
+  FormValue
+} from "../../types";
 /**
  * 判断值是否是空
  * @param val 任意值
  */
-function isNullOrUndefined(val: any) {
+function isNullOrUndefined(val: unknown) {
   return val === null || val === undefined;
 }
-const DATE_TYPES: wform.FormItemType[] = [FormItemType.month, FormItemType.date, FormItemType.week];
-function getFilterValue<T = any>(config: wform.FormConfigItem, value: T): T | Moment {
+const DATE_TYPES: FormItemType[] = ["month", "date", "week"];
+function getFilterValue<T = any>(config: FormConfigItem, value: T): T | Moment {
   const { filterFunc, type } = config;
   if (filterFunc) {
     return filterFunc<T>(value);
@@ -23,7 +33,7 @@ function getFilterValue<T = any>(config: wform.FormConfigItem, value: T): T | Mo
     return value;
   }
 }
-function getFormatValue(config: wform.FormConfigItem, value: any): any {
+function getFormatValue(config: FormConfigItem, value: any): any {
   const { formatFunc, type, childProps } = config;
   if (formatFunc) {
     return formatFunc(value);
@@ -40,15 +50,15 @@ function getFormatValue(config: wform.FormConfigItem, value: any): any {
   }
 }
 @Component
-export default class WForm extends Vue implements wform.FormController {
+export default class WForm extends Vue implements FormController {
   @Prop({ type: Boolean, default: false })
   readonly loading!: boolean;
   @Prop({ type: Function })
-  readonly configFunc!: wform.getFormConfig;
+  readonly configFunc!: getFormConfig;
   @Prop({ type: Object, default: () => ({}) })
-  readonly defaultValues!: wform.CommonProp;
+  readonly defaultValues!: Record<any>;
   @Prop({ type: Function, required: true })
-  readonly createForm!: (form: wform.FormController) => void;
+  readonly createForm!: (form: FormController) => void;
   @Prop({ type: Boolean, default: false })
   readonly disabled!: boolean;
   private myFormData: { [key: string]: any } = {
@@ -70,7 +80,7 @@ export default class WForm extends Vue implements wform.FormController {
   };
   private currentConfig = this.configFunc(this);
 
-  protected formMap: { [key: string]: wform.FormItemInfo } = {};
+  protected formMap: { [key: string]: FormItemInfo } = {};
 
   protected created() {
     this.createForm({
@@ -116,15 +126,15 @@ export default class WForm extends Vue implements wform.FormController {
     });
   }
   //获得表单控件操作对象数组
-  getFormMap(): wform.CommonProp {
+  getFormMap(): Record<any> {
     return this.formMap;
   }
   //获取表单值  arr 不传则获取全部
-  getValues(keys?: string[]): wform.CommonProp {
+  getValues(keys?: string[]): Record<any> {
     if (!keys) {
       keys = Object.keys(this.formMap);
     }
-    return keys.reduce((prev: wform.CommonProp, current: string) => {
+    return keys.reduce((prev: Record<any>, current: string) => {
       return { ...prev, [current]: this.getValue(current) };
     }, {});
   }
@@ -136,7 +146,7 @@ export default class WForm extends Vue implements wform.FormController {
       : undefined;
   }
   //设置值
-  setValues<T extends wform.CommonProp = any>(obj: T): void {
+  setValues<T extends Record<any> = any>(obj: T): void {
     const keys = Object.keys(obj || {});
     keys.forEach(x => {
       const currentFormItem = this.formMap[x];
@@ -158,7 +168,7 @@ export default class WForm extends Vue implements wform.FormController {
     });
   }
   //设置值并校验
-  setValuesWithValidate<T extends wform.CommonProp = any>(obj: T): void {
+  setValuesWithValidate<T extends Record<any> = any>(obj: T): void {
     const keys = Object.keys(obj || {});
     keys.forEach(x => {
       const currentFormItem = this.formMap[x];
@@ -223,17 +233,17 @@ export default class WForm extends Vue implements wform.FormController {
     return true;
   }
   //获取值并交验 他会返回原始值 不会format 注意
-  async getValueWithValidate(key: string): Promise<wform.FormItemValue<any>> {
+  async getValueWithValidate(key: string): Promise<FormItemValue<any>> {
     const currentFormItem = this.formMap[key];
     return currentFormItem.methods.getValueWithValidate();
   }
   //此方法放到异步栈中节省资源消耗 所以用async
-  async setStatus(key: string, obj: wform.StatusMessage, permanent?: boolean) {
+  async setStatus(key: string, obj: StatusMessage, permanent?: boolean) {
     const currentFormItem = this.formMap[key];
     currentFormItem.methods.setStatusMessage(obj, permanent);
   }
   // 提交并获取表单所以字段的值 并校验
-  async submit<T>(): Promise<wform.FormValue<T>> {
+  async submit<T>(): Promise<FormValue<T>> {
     const keys = Object.keys(this.formMap);
     let hasError = false;
     let result = {};
@@ -253,15 +263,15 @@ export default class WForm extends Vue implements wform.FormController {
     return { error: hasError, values: result as T };
   }
 
-  getConfig(key?: string): wform.FormConfigItem {
-    let config: wform.FormConfigItem;
+  getConfig(key?: string): FormConfigItem {
+    let config: FormConfigItem;
     if (key) {
       config = this.currentConfig[key];
       config.key = key;
       //初始值
       config.defaultValue = getFilterValue(config, this.defaultValues[key]);
     } else {
-      config = { type: FormItemType.custom, key: "unknown" };
+      config = { type: "custom", key: "unknown" };
     }
     return config;
   }
@@ -287,11 +297,11 @@ export default class WForm extends Vue implements wform.FormController {
       currentFormItem && currentFormItem.methods.setRequired(obj[key]);
     });
   }
-  delegate(formItemInfo: wform.FormItemInfo) {
+  delegate(formItemInfo: FormItemInfo) {
     if (this.disabled) {
       formItemInfo.methods.setDisabled(this.disabled);
     }
-    const key = formItemInfo.config.key;
+    const key = formItemInfo.config?.key;
     if (key) {
       this.formMap[key] = formItemInfo;
     }

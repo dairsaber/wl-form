@@ -12,7 +12,11 @@
           <wl-form-item disabled :delegate="delegate" key="text" />
           <wl-form-item :delegate="delegate" key="textarea" :rows="5" />
           <wl-form-item v-if="!!visible" :delegate="delegate" key="text2" />
-          <wl-form-item :delegate="delegate" @change="handlerTextChange" key="text3" />
+          <wl-form-item
+            :delegate="delegate"
+            @change="handlerTextChange"
+            key="text3"
+          />
           <wl-form-item
             :delegate="delegate"
             :options="['滚蛋', '滚犊子', '去你大爷的']"
@@ -23,13 +27,17 @@
             :delegate="delegate"
             :options="[
               { value: true, label: '是' },
-              { value: false, label: '非' }
+              { value: false, label: '非' },
             ]"
             :renderItem="renderRadio"
             key="radio"
           />
           <!-- 自定义写法 -->
-          <wl-form-item key="custom" :delegate="delegate" v-slot="{ setValue, value }">
+          <wl-form-item
+            key="custom"
+            :delegate="delegate"
+            v-slot="{ setValue, value }"
+          >
             <div style="width:100%;display:flex;margin-top:4px">
               <AInput
                 style="flex:1"
@@ -52,7 +60,11 @@
           </wl-form-item>
           <a-row style="padding:0 2rem" :gutter="32">
             <a-col :span="12">
-              <wl-form-item key="inputCustom" :delegate="delegate" v-slot="{ setValue, value }">
+              <wl-form-item
+                key="inputCustom"
+                :delegate="delegate"
+                v-slot="{ setValue, value }"
+              >
                 <div style="width:100%;">
                   <AInput
                     style="flex:1"
@@ -69,7 +81,11 @@
               </wl-form-item>
             </a-col>
             <a-col :span="12">
-              <wl-form-item :delegate="delegate" key="prepayment" v-slot="{ setValue, value }">
+              <wl-form-item
+                :delegate="delegate"
+                key="prepayment"
+                v-slot="{ setValue, value }"
+              >
                 <a-input
                   :value="value"
                   :allowClear="true"
@@ -104,28 +120,19 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Test from "./components/Test";
-import { Icon, Button, Input, Select, Radio, Row, Col, Modal } from "ant-design-vue";
+import {
+  Icon,
+  Button,
+  Input,
+  Select,
+  Radio,
+  Row,
+  Col,
+  Modal,
+} from "ant-design-vue";
 import { VNode } from "vue";
-enum FormItemType {
-  text = "text",
-  select = "select",
-  radio = "radio",
-  date = "date",
-  month = "month",
-  week = "week",
-  number = "number",
-  textarea = "textarea",
-  checkbox = "checkbox",
-  switch = "switch",
-  checkboxGroup = "checkboxGroup",
-  custom = "custom"
-}
-enum FormStatusType {
-  error = "error",
-  success = "success",
-  warning = "warning",
-  validating = "validating"
-}
+import { FormConfig, getFormConfig, FormController } from "../packages/types";
+
 /**
  * 配置项 自己去看 FormConfig 定义
  *   key?: string;
@@ -141,11 +148,12 @@ enum FormStatusType {
  *   filterFunc?: <T = any>(value: T) => T; 表单值 --过滤 --> 拿到的值
  *   formatFunc?: <T = any>(value: T) => T; 初始值 --格式化 --> 表单显示值
  */
-function configFunc(context: Vue): wform.FormConfig {
+function configFunc(context: Vue): FormConfig {
   const h = context.$createElement;
+
   return {
     text: {
-      type: FormItemType.text,
+      type: "text",
       label: "text",
       required: true,
       placeholder: "请输入.....",
@@ -153,18 +161,18 @@ function configFunc(context: Vue): wform.FormConfig {
       props: {
         labelCol: { span: 3 },
         wrapperCol: { span: 20 },
-        hasFeedback: true
-      }
+        hasFeedback: true,
+      },
     },
     prepayment: {
-      type: FormItemType.custom,
+      type: "custom",
       label: "prepayment",
       required: true,
       placeholder: "请输入.....",
-      tip: "请输入正确的数据"
+      tip: "请输入正确的数据",
     },
     custom: {
-      type: FormItemType.custom,
+      type: "custom",
       label: "custom",
       required: true,
       tip: "请输入正确的数据",
@@ -174,65 +182,68 @@ function configFunc(context: Vue): wform.FormConfig {
           return "该值不是'滚'";
         }
         return null;
-      }
+      },
     },
     inputCustom: {
-      type: FormItemType.custom,
-      label: "inputCustom"
+      type: "custom",
+      label: "inputCustom",
     },
     text2: {
-      type: FormItemType.text,
+      type: "text",
       label: "text2",
       required: true,
       tip: "请输入正确的数据",
       props: {
         labelCol: { span: 3 },
-        wrapperCol: { span: 20 }
-      }
+        wrapperCol: { span: 20 },
+      },
     },
     text3: {
-      type: FormItemType.text,
+      type: "text",
       label: "text3",
       props: {
         labelCol: { span: 3 },
-        wrapperCol: { span: 20 }
-      }
+        wrapperCol: { span: 20 },
+      },
     },
     select: {
-      type: FormItemType.select,
+      type: "select",
       label: "select",
       required: true,
       tip: "请输入正确的数据",
       props: {
         labelCol: { span: 3 },
-        wrapperCol: { span: 20 }
-      }
+        wrapperCol: { span: 20 },
+      },
     },
     radio: {
-      type: FormItemType.radio,
+      type: "radio",
       label: "radio",
       required: true,
       tip: "请输入正确的数据",
       props: {
         labelCol: { span: 3 },
-        wrapperCol: { span: 20 }
-      }
+        wrapperCol: { span: 20 },
+      },
     },
     switch: {
-      type: FormItemType.switch,
+      type: "switch",
       label: "switch",
       props: {
         labelCol: { span: 3 },
-        wrapperCol: { span: 20 }
-      }
+        wrapperCol: { span: 20 },
+      },
     },
     textarea: {
-      type: FormItemType.textarea,
+      type: "textarea",
       label: "textarea",
       placeholder: "请输入.....",
       required: true,
       tip: (): VNode => {
-        return h("span", {}, [h(Icon, { props: { type: "smile" } }), "这是一段文字"]);
+        return h("span", {}, [
+          h(Icon, { props: { type: "smile" } }),
+          "这是一段文字",
+        ]);
       },
       // childProps: {
       //   rows: 20
@@ -241,11 +252,12 @@ function configFunc(context: Vue): wform.FormConfig {
         // rows: 20,
         labelCol: { span: 3 },
         wrapperCol: { span: 20 },
-        hasFeedback: true
-      }
-    }
+        hasFeedback: true,
+      },
+    },
   };
 }
+
 @Component({
   components: {
     Test,
@@ -253,21 +265,21 @@ function configFunc(context: Vue): wform.FormConfig {
     AInput: Input,
     ARow: Row,
     ACol: Col,
-    AModal: Modal
-  }
+    AModal: Modal,
+  },
 })
 // eslint-disable no-undef
 export default class App extends Vue {
-  private configFunc: wform.getFormConfig = configFunc;
-  private form: wform.FormController | null = null;
+  private configFunc: getFormConfig = configFunc;
+  private form: FormController | null = null;
   private currentValue: any = {};
   private visible = "";
   private testValue = "";
-  private createForm(formController: wform.FormController) {
+  private createForm(formController: FormController) {
     this.form = formController;
   }
   /**
-   *  具体的操作api 看wform.FormController 的定义
+   *  具体的操作api 看FormController 的定义
    *  submit: <T = CommonProp>() => Promise<FormValue<T>>; //这是异步的
    *  getFormMap: () => CommonProp;
    *  setValues: (values: CommonProp) => void;
@@ -302,8 +314,8 @@ export default class App extends Vue {
   private handleClearStatus(): void {
     if (this.form) {
       this.form.setStatus("text", {
-        status: FormStatusType.warning,
-        message: "花里胡哨的......"
+        status: "warning",
+        message: "花里胡哨的......",
       });
     }
   }
@@ -332,8 +344,8 @@ export default class App extends Vue {
       this.form.setStatus(
         "text3",
         {
-          status: FormStatusType.warning,
-          message: "花里胡哨的......"
+          status: "warning",
+          message: "花里胡哨的......",
         },
         true //这个状态作为默认状态
       );
@@ -355,7 +367,7 @@ export default class App extends Vue {
         text: Math.random().toString(),
         text2: Math.random().toString(),
         textarea: Math.random() > 0.5 ? "大傻蛋啥的啥" : undefined,
-        textxxx: "dsds"
+        textxxx: "dsds",
       });
     }
   }
@@ -368,7 +380,7 @@ export default class App extends Vue {
         text3: this.randomString(),
         textarea: this.randomString(),
         textxxx: this.randomString(),
-        switch: Math.random() > 0.5
+        switch: Math.random() > 0.5,
       });
     }
   }
@@ -376,7 +388,7 @@ export default class App extends Vue {
     if (this.form) {
       this.form.hide({
         textarea: Math.random() > 0.5,
-        switch: Math.random() > 0.5
+        switch: Math.random() > 0.5,
       });
     }
   }
@@ -390,7 +402,7 @@ export default class App extends Vue {
       "滚",
       "呵呵哒",
       "唉,...................",
-      undefined
+      undefined,
     ];
     const length = list.length;
     return list[Math.floor(Math.random() * length)];
@@ -398,7 +410,7 @@ export default class App extends Vue {
 }
 </script>
 
-<style lang="less">
+<style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
